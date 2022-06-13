@@ -72,7 +72,7 @@ runs:
         cmd="$cmd --label org.label-schema.vcs-ref=\"${{github.sha}}\""
         cmd="$cmd --label org.label-schema.build-date=\"${{ steps.current_date.outputs.date }}\""
 
-        if [[ "${{ inputs.dockerFilePath}} " != "" ]]; then
+        if [[ -n "${{ inputs.dockerFilePath}}" ]]; then
           cmd="$cmd -f ${{ inputs.dockerfilePath }}"
         fi
 
