@@ -66,29 +66,13 @@ runs:
         echo "context => ${{inputs.context}}"
         echo "docker_image => ${docker_image}"
 
-        cmd="docker build "
-        cmd="$cmd --label org.label-schema.name=\"${{ inputs.image }}\""
-        cmd="$cmd --label org.label-schema.version=\"${tag}\""
-        cmd="$cmd --label org.label-schema.vcs-ref=\"${{github.sha}}\""
-        cmd="$cmd --label org.label-schema.build-date=\"${{ steps.current_date.outputs.date }}\""
-
-        if [[ -n "${{ inputs.dockerFilePath}}" ]]; then
-          cmd="$cmd -f ${{ inputs.dockerfilePath }}"
-        fi
-
-        cmd="$cmd -t ${docker_image} ${{inputs.context}}"
-
-        echo "$cmd"
-
-        eval "$cmd"
-
-        #docker build \
-        #  --label org.label-schema.name="${{ inputs.image }}" \
-        #  --label org.label-schema.version="${tag}" \
-        #  --label org.label-schema.vcs-ref="${{github.sha}}" \
-        #  --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
-        #  -f "${{ inputs.dockerfilePath }}" \
-        #  -t ${docker_image} \
-        #  "${{inputs.context}}"
+        docker build \
+          --label org.label-schema.name="${{ inputs.image }}" \
+          --label org.label-schema.version="${tag}" \
+          --label org.label-schema.vcs-ref="${{github.sha}}" \
+          --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
+          -f "${{ inputs.dockerfilePath }}" \
+          -t ${docker_image} \
+          "${{inputs.context}}"
 
         echo "::set-output name=docker_image::${docker_image}"
