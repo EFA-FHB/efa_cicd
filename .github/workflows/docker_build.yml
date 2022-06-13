@@ -1,0 +1,72 @@
+name: docker_build
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        type: string
+        required: true
+        description: "Value to use as name of container image"
+      context:
+        type: string
+        required: false
+        description: "Value to use as name of container image"
+        default: "."
+      dockerFilePath:
+        type: string
+        desription: "Path to Dockerfile"
+        required: true
+
+    outputs:
+      docker_image:
+        description: "Name of created container image"
+        value: "${{ jobs.build.outputs.docker_image }}"
+      tags:
+        description: "Tags of the container image"
+        value: "${{ jobs.build.outputs.outputs.tags }}"
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: image version
+        id: create_tag
+        shell: bash
+        run: |
+          version=$(grep version package.json | sed -E 's/"version":\s+"([^,]+)",/\1/' | sed -E 's/\s+//')
+          tag="$version-${{ github.run_number }}"
+
+          echo "::set-output name=value::${tag}"
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{env.image}}
+          tags: |
+            type=raw,value=${{steps.create_tag.outputs.value}}
+
+      - name: build
+        id: docker_build_image
+        shell: bash
+        run: |
+          docker_image=${{fromJSON(steps.meta.outputs.json).tags[0]}}
+          tag=${{fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+
+          docker build \
+            --label org.label-schema.name="${{fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.title'] }}" \
+            --label org.label-schema.version="${{fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}" \
+            --label org.label-schema.vcs-ref="${{fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}" \
+            --label org.label-schema.build-date="${{fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}" \
+            -f "${{ inputs.dockerfilePath }}" \
+            -t ${image} \
+            "${{inputs.context}}"
+
+
+          echo "::set-output name=docker_image::${docker_image}"
+          echo "::set-output name=tag::${tag}"
