@@ -29,6 +29,9 @@ runs:
       id: current_date
       shell: bash
       run: |
+        ls -la
+
+
         echo "::set-output name=date::$(date --rfc-3339=seconds)"
 
     - name: current version
@@ -37,11 +40,6 @@ runs:
       run: |
         version=$(grep -E "version" gradle.properties | cut -d"=" -f2)
         echo "::set-output name=version::$version"
-
-    - name: Build with Gradle (without tests)
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: :${{inputs.context}}:assemble
 
     - name: Build Docker Image
       shell: bash
