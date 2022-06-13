@@ -29,16 +29,20 @@ runs:
       id: current_date
       shell: bash
       run: |
-        ls -la
-
-
         echo "::set-output name=date::$(date --rfc-3339=seconds)"
 
     - name: current version
       id: current_version
       shell: bash
       run: |
-        version=$(grep -E "version" gradle.properties | cut -d"=" -f2)
+
+        for file in package.json gradle.properties; do {
+          version=$(find . -maxdepth 1 -name $file -exec sh -c 'grep -E "version" {} | cut -d ":" -f2 | tr -cd "0-9\."' \;)
+          if [[ -n $version ]]; then
+            break;
+          fi
+        } done
+
         echo "::set-output name=version::$version"
 
     - name: Build Docker Image
@@ -64,7 +68,7 @@ runs:
         docker build \
           --label org.label-schema.name="${{ inputs.image }}" \
           --label org.label-schema.version="${tag}" \
-          --label org.label-schema.vcs-ref="$(git rev-parse HEAD)" \
+          --label org.label-schema.vcs-ref="${{github.sha}}" \
           --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
           -f "${{ inputs.dockerfilePath }}" \
           -t ${docker_image} \
