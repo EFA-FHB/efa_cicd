@@ -12,7 +12,7 @@ inputs:
   dockerfilePath:
     description: "Path to DockerFile"
     required: false
-    default: ""
+    default: "Dockerfile"
 
 outputs:
   docker_image:
