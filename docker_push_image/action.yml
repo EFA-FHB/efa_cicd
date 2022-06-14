@@ -1,0 +1,29 @@
+name: docker_push_image
+description: "Builds and tags a container image with Docker"
+
+inputs:
+  imageid:
+    description: "Id of docker image to push"
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Push image
+      id: push_image
+      shell: bash
+      run: |
+        origImage=${{ inputs.imageid }}
+        image_name=$(echo $origImage | cut -d":" -f1)
+        tag=$(echo $origImage | cut -d":" -f2)
+
+        docker push $origImage
+
+        echo "::set-output name=tags::$tag"
+        echo "$tag" > pushed_tags.txt
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: "${{ steps.push_image.outputs.tags }}"
+        path: pushed_tags.txt
