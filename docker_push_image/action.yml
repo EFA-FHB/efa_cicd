@@ -9,7 +9,7 @@ inputs:
 outputs:
   tag:
     description: "Tag of the pushed docker image"
-    value: "${{ steps.tag_image.outputs.tag }}"
+    value: "${{ steps.push_image.outputs.tag }}"
 
 runs:
   using: "composite"
