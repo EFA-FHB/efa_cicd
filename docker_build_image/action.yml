@@ -82,7 +82,7 @@ runs:
         echo "::set-output name=docker_image::${docker_image}"
 
     - name: Scan image for vulnerabilities
-      if: inputs.scanImage != "false"
+      if: ${{inputs.scanImage != "false"}}
       uses: docker://docker.io/aquasec/trivy
       with:
         args: image --ignore-unfixed --exit-code 1 --severity "HIGH,CRITICAL" --cache-dir /var/lib/trivy ${{steps.build_image.outputs.docker_image}}
