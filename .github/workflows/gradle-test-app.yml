@@ -1,23 +1,66 @@
 name: gradle_app_test
 description: "Runs tests with Gradle"
 
-inputs:
-  sendXrayReports:
-    description: "Whether to submit XRAY Test-Reports to JIRA"
-    required: false
-    default: "false"
+on:
+  workflow_call:
+    inputs:
+      appName:
+        type: string
+        required: true
+      repository:
+        type: string
+        required: true
+      revision:
+        type: string
+        required: true
 
-runs:
-  using: "composite"
+jobs:
+  runs-on: ubuntu-latest
+
+ # env:
+ #   POSTGRES_PASSWORD: password
+ #   POSTGRES_DB: bkms-mediator-test
+ #   POSTGRES_USER: bkms-mediator
+ #
+  services:
+    # Label used to access the service container
+    postgres:
+      # Docker Hub image
+      image: postgres:13.4
+      # Provide the password for postgres
+      env:
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: ${{ inputs.appName }}-test
+        POSTGRES_USER: ${{ inputs.appName }}
+      # Set health checks to wait until postgres has started
+      options: >-
+        --health-cmd pg_isready
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+      ports:
+        # Maps tcp port 5432 on service container to the host
+        - 5432:5432
 
   steps:
+
+    - uses: actions/checkout@v3
+      name: Checkout project
+      with:
+        repository: ${{inputs.repository}}
+        ref: ${{inputs.revision}}
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        fetch-depth: 0
+
+    - name: Project setup
+      uses: ./.github/actions/setup_jdk
 
     - name: XRAY - setup vars for report
       shell: bash
       run: |
         echo "XRAY_BEGIN_DATE=$(date +%Y-%m-%dT%R:%S.000%z)" >> $GITHUB_ENV
-        echo "XRAY_REVISION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-        echo "XRAY_APP_NAME=$(grep -E "docker.image.name-prefix" gradle.properties | cut -d"=" -f2)" >> $GITHUB_ENV
+        echo "XRAY_REVISION=${{inputs.revision}}" >> $GITHUB_ENV
+        echo "XRAY_APP_NAME=${{inputs.appName}}" >> $GITHUB_ENV
 
     - name: Run unit-tests
       if: "false"
@@ -54,10 +97,11 @@ runs:
         cat xray-info.json
 
     - name: XRAY - send results to JIRA
+      if: false
       #if: ${{ matrix.type == 'xray-tests' && github.ref == 'refs/heads/main' }}
       uses: mikepenz/xray-action@v2.3.0
       continue-on-error: true
-      #timeout-minutes: 5
+      timeout-minutes: 5
       with:
         username: foo
         password: bar
