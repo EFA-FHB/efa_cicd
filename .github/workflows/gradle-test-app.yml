@@ -3,7 +3,7 @@ name: gradle_app_test
 on:
   workflow_call:
     inputs:
-      appName:
+      app:
         type: string
         required: true
       repository:
@@ -12,6 +12,10 @@ on:
       revision:
         type: string
         required: true
+      xray-submit-report:
+        type: boolean
+        required: false
+        default: false
 
 jobs:
 
@@ -32,8 +36,8 @@ jobs:
        # Provide the password for postgres
        env:
          POSTGRES_PASSWORD: password
-         POSTGRES_DB: ${{ inputs.appName }}-test
-         POSTGRES_USER: ${{ inputs.appName }}
+         POSTGRES_DB: ${{ inputs.app }}-test
+         POSTGRES_USER: ${{ inputs.app }}
        # Set health checks to wait until postgres has started
        options: >-
          --health-cmd pg_isready
@@ -65,7 +69,6 @@ jobs:
          echo "XRAY_APP_NAME=${{inputs.appName}}" >> $GITHUB_ENV
 
      - name: Run unit-tests
-       if: "false"
        id: run_tests
        uses: gradle/gradle-build-action@v2
        with:
@@ -95,27 +98,24 @@ jobs:
          }
          EOF
 
-         envsubst  < xray-info.json.tpl > xray-info.json
+         envsubst  < xray-info-json.tpl > xray-info.json
          cat xray-info.json
 
      - name: XRAY - send results to JIRA
-       if: false
-       #if: ${{ matrix.type == 'xray-tests' && github.ref == 'refs/heads/main' }}
+       if: ${{ inputs.xray-submit-report }}
        uses: mikepenz/xray-action@v2.3.0
        continue-on-error: true
        timeout-minutes: 5
        with:
-         username: foo
-         password: bar
-         #username: ${{ secrets.XRAY_API_TESTREPORT_USERNAME }}
-         #password: ${{ secrets.XRAY_API_TESTREPORT_PASSWORD }}
+         username: ${{ secrets.XRAY_API_TESTREPORT_USERNAME }}
+         password: ${{ secrets.XRAY_API_TESTREPORT_PASSWORD }}
          xrayCloud: "false"
          xrayBaseUrl: "https://jira.nortal.com"
          testFormat: "junit"
          testPaths: "**/reports/*.xml"
          testEnvironments: GitHub
-         testPlanKey: ${{ env.XRAY_TESTPLAN_KEY }} #see https://jira.nortal.com/browse/D602904-101#view-issue-testplan-testexecs-section_heading
-         projectKey: ${{ env.XRAY_PROJECT_KEY }}
+         testPlanKey: ${{ inputs.xray-plan-key }} #see https://jira.nortal.com/browse/D602904-101#view-issue-testplan-testexecs-section_heading
+         projectKey: ${{ inputs.xray-project-key }}
          testExecutionJson: xray-info.json
 
 
