@@ -59,8 +59,10 @@ runs:
       continue-on-error: true
       #timeout-minutes: 5
       with:
-        username: ${{ secrets.XRAY_API_TESTREPORT_USERNAME }}
-        password: ${{ secrets.XRAY_API_TESTREPORT_PASSWORD }}
+        username: foo
+        password: bar
+        #username: ${{ secrets.XRAY_API_TESTREPORT_USERNAME }}
+        #password: ${{ secrets.XRAY_API_TESTREPORT_PASSWORD }}
         xrayCloud: "false"
         xrayBaseUrl: "https://jira.nortal.com"
         testFormat: "junit"

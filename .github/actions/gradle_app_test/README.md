@@ -1,4 +1,4 @@
-## docker_push_image
+## gradle_app_test
 
 This action pushes a given image to a registry.
 
