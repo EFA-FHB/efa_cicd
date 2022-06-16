@@ -1,5 +1,4 @@
 name: gradle_app_test
-description: "Runs tests with Gradle"
 
 on:
   workflow_call:
