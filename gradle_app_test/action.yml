@@ -1,0 +1,75 @@
+name: gradle_app_test
+description: "Runs tests with Gradle"
+
+inputs:
+  sendXrayReports:
+    description: "Whether to submit XRAY Test-Reports to JIRA"
+    required: false
+    default: "false"
+
+runs:
+
+  using: "composite"
+
+  steps:
+
+    - name: XRAY - setup vars for report
+      shell: bash
+      run: |
+        echo "XRAY_BEGIN_DATE=$(date +%Y-%m-%dT%R:%S.000%z)" >> $GITHUB_ENV
+        echo "XRAY_REVISION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "XRAY_APP_NAME=$(grep -E "docker.image.name-prefix" gradle.properties | cut -d"=" -f2)" >> $GITHUB_ENV
+
+    - name: Run unit-tests
+      if: "false"
+      id: run_tests
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: test xrayTests --info -Pgpr.key=${{ secrets.GHP_XRAY_TOKEN }}
+
+    - name: XRAY - Create xray-info.json
+      shell: bash
+      run: |
+        export XRAY_END_DATE=$(date +%Y-%m-%dT%R:%S.000%z)
+
+        cat > xray-info-json.tpl <<EOF
+        {
+          "fields": {
+              "project": {
+                    "key": "$XRAY_PROJECT_KEY"
+                },
+                "summary": "Automatic Test execution",
+                "issuetype": {
+                    "id": "11702"
+                },
+                "customfield_21317": "$XRAY_BEGIN_DATE",
+                "customfield_21318": "$XRAY_END_DATE",
+                "customfield_21319": "$XRAY_REVISION",
+                "customfield_21327": ["$XRAY_TESTPLAN_KEY"],
+                "customfield_21325": ["Github"]
+          }
+        }
+        EOF
+
+        envsubst  < xray-info.json.tpl > xray-info.json
+        cat xray-info.json
+
+    - name: XRAY - send results to JIRA
+      timeout-minutes: 5
+      #if: ${{ matrix.type == 'xray-tests' && github.ref == 'refs/heads/main' }}
+      uses: mikepenz/xray-action@v2.3.0
+      continue-on-error: true
+      with:
+        username: ${{ secrets.XRAY_API_TESTREPORT_USERNAME }}
+        password: ${{ secrets.XRAY_API_TESTREPORT_PASSWORD }}
+        xrayCloud: "false"
+        xrayBaseUrl: "https://jira.nortal.com"
+        testFormat: "junit"
+        testPaths: "**/reports/*.xml"
+        testEnvironments: GitHub
+        testPlanKey: ${{ env.XRAY_TESTPLAN_KEY }} #see https://jira.nortal.com/browse/D602904-101#view-issue-testplan-testexecs-section_heading
+        projectKey: ${{ env.XRAY_PROJECT_KEY }}
+        testExecutionJson: xray-info.json
+
+
+
