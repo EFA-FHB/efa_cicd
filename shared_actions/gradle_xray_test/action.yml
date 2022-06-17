@@ -80,7 +80,7 @@ runs:
       if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
       uses: mikepenz/xray-action@v2.3.0
       continue-on-error: true
-      timeout-minutes: 5
+      #timeout-minutes: 5
       with:
         username: ${{ inputs.xray-api-username }}
         password: ${{ inputs.xray-api-password }}
