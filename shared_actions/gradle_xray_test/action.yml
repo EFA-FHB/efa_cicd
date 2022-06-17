@@ -33,23 +33,35 @@ runs:
   using: "composite"
 
   steps:
-
     - name: XRAY - setup vars for report
       shell: bash
+      if: ${{ xray-send-reports-to-jira == 'true' }}
       run: |
+        missing_args=()
+        [[ -z "${{xray-api-username}}" ]] && missing_args+=(xray-api-username)
+        [[ -z "${{xray-api-password}}" ]] && missing_args+=(xray-api-password)
+        [[ -z "${{xray-testplan-key}}" ]] && missing_args+=(xray-testplan-key)
+        [[ -z "${{xray-project-key}}" ]] && missing_args+=(xray-project-key)
+
+        if [[ ${#missing_args} -gt 0 ]]; then
+          echo -e "Sending reports not possible";
+          echo -e "You must specify the following action arguments: $(echo ${missing_args[*]} | sed 's/ /, /g')";
+          exit 1;
+        fi
+
         echo "XRAY_BEGIN_DATE=$(date +%Y-%m-%dT%R:%S.000%z)" >> $GITHUB_ENV
         echo "XRAY_REVISION=${{github.sha}}" >> $GITHUB_ENV
         echo "XRAY_APP_NAME=$app" >> $GITHUB_ENV
         echo "XRAY_TESTPLAN_KEY=${{inputs.xray-testplan-key}}" >> $GITHUB_ENV
 
     - name: Run unit-tests
-      if: "false"
       id: run_tests
       uses: gradle/gradle-build-action@v2
       with:
         arguments: test xrayTests --info -Pgpr.key=${{ inputs.xray-ghp-token }}
 
     - name: XRAY - Create xray-info.json
+      if: ${{ xray-send-reports-to-jira == 'true' }}
       shell: bash
       run: |
         export XRAY_END_DATE=$(date +%Y-%m-%dT%R:%S.000%z)
