@@ -13,7 +13,7 @@
 #
 function help() {
   echo "Options: "
-  echo -e "--copy_target_dir \t required - Path of directory to copy all actions to"
+  echo -e "ACTIONS_TARGET_DIR \t required - project root to install actions to"
   echo -e "\n Usage: ACTIONS_TARGET_DIR=../target $0"
   exit 1;
 }
@@ -25,9 +25,8 @@ function main() {
     echo "ACTIONS_TARGET_DIR not defined!" && help
   }
 
-  echo "${ACTIONS_TARGET_DIR}" | grep -E ".github/?$|.github/actions$" -q
-  [[ $(echo $?) -ne 0 ]] && {
-    echo "ACTIONS_TARGET_DIR is not a valid github actions directory" && help
+  [[ ! "${ACTIONS_TARGET_DIR}" =~ .github$ ]] && {
+    ACTIONS_TARGET_DIR="${ACTIONS_TARGET_DIR}/.github"
   }
 
   [[ ! "${ACTIONS_TARGET_DIR}" =~ actions$ ]] && {
