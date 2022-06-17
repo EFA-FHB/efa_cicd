@@ -46,7 +46,7 @@ runs:
         if [[ -n "${{inputs.tag}}" ]]; then
           tag=${{inputs.tag}}
         else
-          tag_file=$(find . -type f -name "${{inputs.tag-file-name}" | head -1)
+          tag_file=$(find . -type f -name "${{inputs.tag-file-name}}" | head -1)
           tag=$(cat $tag_file | head -1)
         fi
         echo "::set-output name=value::$tag"
