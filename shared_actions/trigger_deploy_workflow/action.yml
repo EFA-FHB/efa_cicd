@@ -27,7 +27,7 @@ runs:
     - name: verify arguments
       shell: bash
       run: |
-        if [[ -z "${{ inputs.tag }}" || -z "${{ inputs.tag-file-name}}" ]]; then
+        if [[ -z "${{ inputs.tag }}" && -z "${{ inputs.tag-file-name}}" ]]; then
           echo -e "You must specify one of the following action arguments: tag, tag-file-name";
           exit 1;
         fi
