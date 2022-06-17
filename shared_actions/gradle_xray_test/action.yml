@@ -35,13 +35,13 @@ runs:
   steps:
     - name: XRAY - setup vars for report
       shell: bash
-      if: ${{ xray-send-reports-to-jira == 'true' }}
+      if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
       run: |
         missing_args=()
-        [[ -z "${{xray-api-username}}" ]] && missing_args+=(xray-api-username)
-        [[ -z "${{xray-api-password}}" ]] && missing_args+=(xray-api-password)
-        [[ -z "${{xray-testplan-key}}" ]] && missing_args+=(xray-testplan-key)
-        [[ -z "${{xray-project-key}}" ]] && missing_args+=(xray-project-key)
+        [[ -z "${{inputs.xray-api-username}}" ]] && missing_args+=(xray-api-username)
+        [[ -z "${{inputs.xray-api-password}}" ]] && missing_args+=(xray-api-password)
+        [[ -z "${{inputs.xray-testplan-key}}" ]] && missing_args+=(xray-testplan-key)
+        [[ -z "${{inputs.xray-project-key}}" ]] && missing_args+=(xray-project-key)
 
         if [[ ${#missing_args} -gt 0 ]]; then
           echo -e "Sending reports not possible";
@@ -61,7 +61,7 @@ runs:
         arguments: test xrayTests --info -Pgpr.key=${{ inputs.xray-ghp-token }}
 
     - name: XRAY - Create xray-info.json
-      if: ${{ xray-send-reports-to-jira == 'true' }}
+      if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
       shell: bash
       run: |
         export XRAY_END_DATE=$(date +%Y-%m-%dT%R:%S.000%z)
