@@ -1,0 +1,88 @@
+name: docker_build_image
+description: "Builds and tags a container image with Docker"
+
+inputs:
+  image:
+    description: "Value to use as name of container image"
+    required: true
+  context:
+    description: "Path to use as build context"
+    required: false
+    default: "."
+  dockerfilePath:
+    description: "Path to DockerFile"
+    required: false
+    default: "Dockerfile"
+  scanImage:
+    description: "Scan image for vulnerabilities"
+    required: false
+    default: "false"
+
+outputs:
+  docker_image:
+    description: "Name of created container image"
+    value: "${{ steps.build_image.outputs.docker_image }}"
+  tags:
+    description: "Tags of the container image"
+    value: "${{ steps.tag_image.outputs.tags }}"
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: current date
+      id: current_date
+      shell: bash
+      run: |
+        echo "::set-output name=date::$(date --rfc-3339=seconds)"
+
+    - name: current version
+      id: current_version
+      shell: bash
+      run: |
+
+        for file in package.json gradle.properties; do {
+          version=$(find . -maxdepth 1 -name $file -exec sh -c 'grep -E "version" {} | cut -d ":" -f2 | tr -cd "0-9\."' \;)
+          if [[ -n $version ]]; then
+            break;
+          fi
+        } done
+
+        echo "::set-output name=version::$version"
+
+    - name: Build Docker Image
+      shell: bash
+      id: build_image
+      run: |
+
+        branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
+
+        tag="${{ steps.current_version.outputs.version }}-${{ github.run_number }}"
+
+        [[ ! ${branchName} =~ release|main ]] && {
+          normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
+          tag="${tag}-${normalized_branch_name}"
+        }
+
+        docker_image="${{ inputs.image }}:${tag}"
+
+        echo "dockerfilePath => ${{inputs.dockerfilePath}}"
+        echo "context => ${{inputs.context}}"
+        echo "docker_image => ${docker_image}"
+
+        docker build \
+          --label org.label-schema.name="${{ inputs.image }}" \
+          --label org.label-schema.version="${tag}" \
+          --label org.label-schema.vcs-ref="${{github.sha}}" \
+          --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
+          -f "${{ inputs.dockerfilePath }}" \
+          -t ${docker_image} \
+          "${{inputs.context}}"
+
+        echo "::set-output name=docker_image::${docker_image}"
+
+    - name: Scan image for vulnerabilities
+      if: ${{inputs.scanImage != 'false' }}
+      uses: docker://docker.io/aquasec/trivy
+      with:
+        args: image --ignore-unfixed --exit-code 1 --severity "HIGH,CRITICAL" ${{steps.build_image.outputs.docker_image}}
