@@ -1,0 +1,66 @@
+name: trigger_deploy_workflow
+description: "Triggers a deployment"
+
+inputs:
+  tag:
+    description: "Tag to deploy"
+    required: false
+  tag-file-name:
+    description: "Filename to read the tag to deploy to from"
+    required: false
+  stage:
+    description: "Stage to deploy to"
+    required: false
+    default: "dev"
+  token:
+    description: "Token required to trigger the workflow."
+    required: true
+  workflow:
+    description: "Name of workflow to trigger."
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: verify arguments
+      shell: bash
+      run: |
+        if [[ -z "${{ inputs.tag }}" || -z "${{ inputs.tag-file-name}}" ]]; then
+          echo -e "You must specify one of the following action arguments: tag, tag-file-name";
+          exit 1;
+        fi
+
+    - name: download tag-file
+      uses: actions/download-artifact@v2
+      if: ${{ inputs.tag == '' && inputs.tag-file-name != '' }}
+      with:
+        path: ${{ inputs.tag-file-name }}
+
+    - name: read tag to deploy
+      id: get_tag
+      shell: bash
+      run: |
+        tag=
+        if [[ -n "${{inputs.tag}}" ]]; then
+          tag=${{inputs.tag}}
+        else
+          tag_file=$(find . -type f -name "${{inputs.tag-file-name}" | head -1)
+          tag=$(cat $tag_file | head -1)
+        fi
+        echo "::set-output name=value::$tag"
+
+    - name: trigger deployment ${{ steps.get_tag.outputs.value }}
+      if: ${{ steps.get_tag.outputs.value != '' }}
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ inputs.token }}
+        repository: EFA-FHB/k8s_workflows
+        event-type: ${{inputs.workflow}}
+        client-payload: '{"tag":"${{ steps.get_tag.outputs.value }}","stage":"${{inputs.stage}}"}'
+
+
+
+
+
