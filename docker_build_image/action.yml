@@ -85,4 +85,4 @@ runs:
       if: ${{inputs.scanImage != 'false' }}
       uses: docker://docker.io/aquasec/trivy
       with:
-        args: image --ignore-unfixed --exit-code 1 --severity "HIGH,CRITICAL" ${{steps.build_image.outputs.docker_image}}
+        args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.build_image.outputs.docker_image}}
