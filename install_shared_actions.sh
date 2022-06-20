@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Github actions which reference special Github-Action contexts like ${{secret.*}} will
-# not work if they are not present inside the .github/actions of the repository which uses
-# it.
-#
 # This script will copy all Github-Actions inside "actions" directory over to another repository's
 # Github-Actions directory, which enables usage of those actions in the workflows defined inside
 # repository.
