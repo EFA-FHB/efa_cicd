@@ -64,6 +64,8 @@ runs:
           tag="${tag}-${normalized_branch_name}"
         }
 
+        tag="${tag}-${{ github.run_number }}"
+
         docker_image="${{ inputs.image }}:${tag}"
 
         echo "dockerfilePath => ${{inputs.dockerfilePath}}"
