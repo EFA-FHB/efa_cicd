@@ -1,0 +1,11 @@
+name: setup_jdk_17
+description: "setup JDK17"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
