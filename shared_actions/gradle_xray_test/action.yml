@@ -5,6 +5,10 @@ inputs:
   app:
     description: "Name of application"
     required: true
+  xray-send-reports-to-jira:
+    description: "Whether to submit XRAY Test-Reports to JIRA"
+    required: false
+    default: "false"
   xray-ghp-token:
     description: "Token to fetch xray extensions from Github"
     required: true
@@ -24,10 +28,6 @@ inputs:
     description: "Jira key belonging to the XRAY test project"
     required: false
     default: ""
-  xray-send-reports-to-jira:
-    description: "Whether to submit XRAY Test-Reports to JIRA"
-    required: false
-    default: "false"
 
 runs:
   using: "composite"

@@ -3,20 +3,20 @@ description: "Builds and tags a container image with Docker"
 
 inputs:
   image:
-    description: "Value to use as name of container image"
+    description: "Value to use as name of docker container image"
     required: true
   context:
-    description: "Path to use as build context"
+    description: "Path to use as docker build context"
     required: false
     default: "."
   dockerfilePath:
-    description: "Path to DockerFile"
+    description: "Path of DockerFile"
     required: false
     default: "Dockerfile"
   scanImage:
     description: "Scan image for vulnerabilities"
     required: false
-    default: "false"
+    default: "true"
 
 outputs:
   docker_image:

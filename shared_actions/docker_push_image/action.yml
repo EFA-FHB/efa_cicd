@@ -3,7 +3,7 @@ description: "Pushes a container image with Docker"
 
 inputs:
   imageid:
-    description: "Id of docker image to push"
+    description: "Reference of the docker image to push"
     required: true
   tag-file-name:
     description: "name of tag file"
