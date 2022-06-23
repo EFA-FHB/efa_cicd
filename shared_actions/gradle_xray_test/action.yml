@@ -58,7 +58,7 @@ runs:
       id: run_tests
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: test xrayTests --info -Pgpr.key=${{ inputs.xray-ghp-token }}
+        arguments: test --info -Pgpr.key=${{ inputs.xray-ghp-token }}
 
     - name: XRAY - Create xray-info.json
       if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
