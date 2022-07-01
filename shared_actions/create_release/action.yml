@@ -28,7 +28,15 @@ runs:
   using: "composite"
 
   steps:
-
+    - name: update main branch
+      if: ${{ github.ref != 'refs/heads/main' }}
+      shell: bash
+      run: |
+        branch=$(echo ${{github.ref}} | cut -d "/" -f2-)
+        git checkout main
+        git pull
+        git checkout $branch
+        
     - name: import gpg
       id: import_gpg
       uses: crazy-max/ghaction-import-gpg@v5.0.0
