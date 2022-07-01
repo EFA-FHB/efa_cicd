@@ -20,12 +20,9 @@ inputs:
   name:
     description: "Name of the release. defaults to tag name"
     required: false
-  semver_type:
+  release_type:
     description: "Indicator of the release type"
     required: true
-  tag:
-    description: "Tag of the release"
-    required: false
 
 runs:
   using: "composite"
