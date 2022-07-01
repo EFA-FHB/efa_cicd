@@ -2,6 +2,12 @@ name: create_release
 description: "Creates a release"
 
 inputs:
+  gpg_private_key:
+    description: "GPG Private key to import for tag signing"
+    required: true
+  gpg_passphrase:
+    description: "GPG Passphrase to import private-key"
+    required: true
   token:
     description: "Token required to trigger the workflow."
     required: true
@@ -25,6 +31,69 @@ runs:
   using: "composite"
 
   steps:
+
+    - name: import gpg
+      id: import_gpg
+      uses: crazy-max/ghaction-import-gpg@v5.0.0
+      with:
+        gpg_private_key: ${{ inputs.gpg_private_key }}
+        passphrase: ${{ inputs.gpg_passphrase }}
+        git_config_global: true
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+
+    - name: create tag
+      id: tag
+      uses: mathieudutour/github-tag-action@v6.0
+      with:
+        github_token: ${{ inputs.token }}
+        default_bump: ${{inputs.release_type}}
+        dry_run: true
+
+    - name: find version file
+      id: version_file
+      shell: bash
+      run: |
+        for file in gradle.properties package.json; do {
+          find $file &> /dev/null
+          if [[ $(echo $?) -eq 0 ]]; then
+            echo "::set-output name=value::$file"
+            break;
+          fi
+        } done
+
+    - name: commit tag + version
+      shell: bash
+      env:
+        versionFile: ${{steps.version_file.outputs.value}}
+        newTag: ${{steps.tag.outputs.new_tag}}
+        newVersion: ${{steps.tag.outputs.new_version}}
+        GITHUB_TOKEN: ${{ secrets.OSLASH_BOT_GITHUB_TOKEN }}
+        GIT_AUTHOR_NAME: ${{ steps.import_gpg.outputs.name }}
+        GIT_AUTHOR_EMAIL: ${{ steps.import_gpg.outputs.email }}
+        GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
+        GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
+      run: |
+
+        if [[ "${{env.versionFile}}" == "gradle.properties" ]]; then
+          sed -i -E "s/(version=).*/\1${{env.newVersion}}/" ${{env.versionFile}}
+        fi
+
+        if [[ "${{env.versionFile}}" == "package.json" ]]; then
+          sed -i -E "s/(\"version\": ).*/\1\"${{env.newVersion}}\" /" ${{env.versionFile}}
+        fi
+
+        git commit -S -m "[github] update version --skip-msg-validation" -- ${{env.versionFile}}
+
+        tag="${{env.newTag}}"
+
+        git tag -sam "[github] create new tag" $tag
+
+    - name: git push
+      uses: CasperWA/push-protected@v2.10.0
+      with:
+        token: ${{ inputs.token }}
+        tags: true
 
     - name: changelog config template
       id: changelog_config_path
