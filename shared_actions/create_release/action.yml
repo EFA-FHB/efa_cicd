@@ -1,0 +1,36 @@
+name: create_release
+description: "Creates a release"
+
+inputs:
+  token:
+    description: "Token required to trigger the workflow."
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: Create changelog template
+      id: changelog_template
+      shell: bash
+      run: |
+        cat > ${{GITHUB_WORKSPACE}}/changelog-config.json <<EOF
+        {
+          "template": "\n\nDiff: ${{RELEASE_DIFF}}\n\n${{CHANGELOG}}",
+          "pr_template": "- (${{MERGE_SHA}}) ${{TITLE}}",
+        }
+        EOF
+
+    - name: Build Changelog
+      id: github_release
+      uses: mikepenz/release-changelog-builder-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        configuration: ${{GITHUB_WORKSPACE}}/changelog-config.json
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v0.1.14
+      with:
+        body: ${{steps.github_release.outputs.changelog}}
