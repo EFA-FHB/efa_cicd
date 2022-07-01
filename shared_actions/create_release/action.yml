@@ -80,7 +80,7 @@ runs:
           sed -i -E "s/(\"version\": ).*/\1\"${{env.newVersion}}\" /" ${{env.versionFile}}
         fi
 
-        git commit -S -m "[github] update version --skip-msg-validation" -- ${{env.versionFile}}
+        git commit -S -m "[github] update version --skip-msg-validation" -- ${{env.versionFile}} &> /dev/null
 
         tag="${{env.newTag}}"
 
