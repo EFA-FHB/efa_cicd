@@ -5,6 +5,18 @@ inputs:
   token:
     description: "Token required to trigger the workflow."
     required: true
+  draft:
+    description: "Indicator of whether or not this release is a draft"
+    required: false
+  prerelease:
+    description: "Indicator of whether or not is a prerelease"
+    required: false
+  name:
+    description: "Name of the release. defaults to tag name"
+    required: false
+  semver_type:
+    description: "Indicator of the release type"
+    required: true
 
 runs:
   using: "composite"
@@ -30,4 +42,7 @@ runs:
     - name: Create Release
       uses: softprops/action-gh-release@v0.1.14
       with:
+        draft: ${{inputs.draft}}
+        prerelease: ${{inputs.draft}}
+        name: ${{inputs.name}}
         body: ${{steps.github_release.outputs.changelog}}
