@@ -46,6 +46,7 @@ runs:
         github_token: ${{ inputs.token }}
         default_bump: ${{inputs.release_type}}
         dry_run: true
+        release_branches: "release.*,hotfix.*,main"
 
     - name: find version file
       id: version_file
