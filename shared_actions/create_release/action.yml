@@ -17,6 +17,9 @@ inputs:
   semver_type:
     description: "Indicator of the release type"
     required: true
+  tag:
+    description: "Tag of the release"
+    required: false
 
 runs:
   using: "composite"
@@ -46,3 +49,4 @@ runs:
         prerelease: ${{inputs.draft}}
         name: ${{inputs.name}}
         body: ${{steps.github_release.outputs.changelog}}
+        tag_name: ${{inputs.tag}}
