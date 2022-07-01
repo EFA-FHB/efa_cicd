@@ -15,7 +15,7 @@ runs:
       id: changelog_template
       shell: bash
       run: |
-        cat > ${{GITHUB_WORKSPACE}}/changelog-config.json <<EOF
+        cat > changelog-config.json <<EOF
         {
           "template": "\n\nDiff: ${{RELEASE_DIFF}}\n\n${{CHANGELOG}}",
           "pr_template": "- (${{MERGE_SHA}}) ${{TITLE}}",
@@ -26,9 +26,9 @@ runs:
       id: github_release
       uses: mikepenz/release-changelog-builder-action@v3
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.token }}
       with:
-        configuration: ${{GITHUB_WORKSPACE}}/changelog-config.json
+        configuration: changelog-config.json
 
     - name: Create Release
       uses: softprops/action-gh-release@v0.1.14
