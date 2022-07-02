@@ -87,6 +87,14 @@ runs:
 
         git tag -sam "[github] create new tag" $tag
 
+    - name: echo branch
+      env:
+        branch: ${{env.GITHUB_REF_NAME}}
+      shell: bash
+      run: |
+        echo $GITHUB_REF_NAME
+        echo ${{env.GITHUB_REF_NAME}}
+
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
       env:
