@@ -29,12 +29,12 @@ runs:
 
   steps:
 
-    - name: echo branch
-      if: false
+    - name: current branch
+      id: branch_name
       shell: bash
-      run: echo ${{ toJSON(github) }}
-
-
+      run:
+        branch=$(echo "${{github.ref}}" | cut -d "/" -f2-)
+        echo "::set-output name=value::${branch}"
 
     - name: import gpg
       id: import_gpg
@@ -100,7 +100,7 @@ runs:
       with:
         token: ${{ inputs.token }}
         tags: true
-        branch: ${{github.ref}}
+        branch: ${{ steps.branch_name.outputs.value }}
         debug: true
 
     - name: changelog config template
