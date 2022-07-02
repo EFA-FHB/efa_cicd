@@ -99,7 +99,7 @@ runs:
       with:
         token: ${{ inputs.token }}
         tags: true
-        branch: "${GITHUB_REF_NAME}"
+        branch: $GITHUB_REF_NAME
         debug: true
 
     - name: changelog config template
