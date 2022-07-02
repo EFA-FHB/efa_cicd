@@ -29,6 +29,21 @@ runs:
 
   steps:
 
+    - uses: actions/checkout@v3
+      if: ${{ github.ref != 'refs/heads/main' }}
+      with:
+        ref: main
+
+    - name: update main branch
+      if: ${{ github.ref != 'refs/heads/main' }}
+      run: git pull
+
+    - uses: actions/checkout@v3
+      if: ${{ github.ref != 'refs/heads/main' }}
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
     - name: import gpg
       id: import_gpg
       uses: crazy-max/ghaction-import-gpg@v5.0.0
@@ -39,14 +54,6 @@ runs:
         git_user_signingkey: true
         git_commit_gpgsign: true
 
-    - name: update main branch
-      if: ${{ github.ref != 'refs/heads/main' }}
-      shell: bash
-      run: |
-        branch=$(echo ${{github.ref}} | cut -d "/" -f2-)
-        git checkout main
-        git pull
-        git checkout $branch
 
     - name: create tag
       id: tag
