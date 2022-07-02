@@ -97,10 +97,12 @@ runs:
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
+      env:
+        branch: ${{ steps.branch_name.outputs.value }}
       with:
         token: ${{ inputs.token }}
         tags: true
-        branch: ${{ steps.branch_name.outputs.value }}
+        branch: ${{ env.branch }}
         debug: true
 
     - name: changelog config template
