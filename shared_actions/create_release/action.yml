@@ -36,6 +36,7 @@ runs:
 
     - name: update main branch
       if: ${{ github.ref != 'refs/heads/main' }}
+      shell: bash
       run: git pull
 
     - uses: actions/checkout@v3
