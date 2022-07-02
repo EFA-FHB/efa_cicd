@@ -29,6 +29,10 @@ runs:
 
   steps:
 
+    - name: echo branch
+      shell: bash
+      run: echo ${{ toJSON(github) }}
+
     - uses: actions/checkout@v3
       if: ${{ github.ref != 'refs/heads/main' }}
       with:
