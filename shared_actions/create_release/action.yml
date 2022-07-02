@@ -34,21 +34,7 @@ runs:
       shell: bash
       run: echo ${{ toJSON(github) }}
 
-    - uses: actions/checkout@v3
-      if: ${{ github.ref != 'refs/heads/main' }}
-      with:
-        ref: main
 
-    - name: update main branch
-      if: ${{ github.ref != 'refs/heads/main' }}
-      shell: bash
-      run: git pull
-
-    - uses: actions/checkout@v3
-      if: ${{ github.ref != 'refs/heads/main' }}
-      with:
-        fetch-depth: 0
-        persist-credentials: false
 
     - name: import gpg
       id: import_gpg
