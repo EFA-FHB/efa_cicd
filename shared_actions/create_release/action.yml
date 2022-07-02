@@ -89,10 +89,12 @@ runs:
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
+      env:
+        branch: ${{env.GITHUB_REF_NAME }}
       with:
         token: ${{ inputs.token }}
         tags: true
-        branch: ${{ GITHUB_REF_NAME }}
+        branch: ${{ env.branch }}
         debug: true
 
     - name: changelog config template
