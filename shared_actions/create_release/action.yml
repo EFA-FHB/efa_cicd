@@ -101,6 +101,7 @@ runs:
         token: ${{ inputs.token }}
         tags: true
         branch: ${{github.ref}}
+        debug: true
 
     - name: changelog config template
       id: changelog_config_path
