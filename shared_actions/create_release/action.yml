@@ -30,6 +30,7 @@ runs:
   steps:
 
     - name: echo branch
+      if: false
       shell: bash
       run: echo ${{ toJSON(github) }}
 
