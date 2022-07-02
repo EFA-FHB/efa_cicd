@@ -95,6 +95,21 @@ runs:
         branch: ${{github.ref_name}}
         debug: true
 
+    - name: merge main
+      if: ${{github.ref_name != "main"}}
+      shell: bash
+      run: |
+        git checkout main
+        git pull
+        git merge ${{github.ref_name}}
+
+    - name: push update to main
+      if: ${{github.ref_name != "main"}}
+      uses: CasperWA/push-protected@v2.10.0
+      with:
+        token: ${{ inputs.token }}
+        branch: main
+
     - name: changelog config template
       id: changelog_config_path
       shell: bash
