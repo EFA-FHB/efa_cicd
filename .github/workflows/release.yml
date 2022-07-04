@@ -1,0 +1,57 @@
+# This workflow creates a release for the application.
+#
+name: "🎁 Create Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Specify semver type of release"
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      release_name:
+        description: 'Specify name of release (defaults to tag_name)'
+        type: string
+
+concurrency:
+  group: release
+
+jobs:
+
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+        if: false
+        with:
+          ref: main
+
+      - name: update main branch
+        if: false
+        shell: bash
+        run: git fetch --force
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+
+      - name: create_release
+        uses: ./.github/actions/create_release
+        with:
+          gpg_private_key: ${{secrets.BOT_GPG_PRIVATE_KEY}}
+          gpg_passphrase: ${{secrets.BOT_GPG_PASSPHRASE}}
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          name: ${{inputs.release_name}}
+          release_type: ${{inputs.release_type}}
