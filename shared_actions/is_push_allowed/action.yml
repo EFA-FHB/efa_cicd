@@ -4,7 +4,7 @@ description: "Checks the Github environment to determine if a Docker image can b
 outputs:
   result:
     description: "Indicator of whether the image can be pushed"
-    value: "${{ steps.set_result.outputs.value }}"
+    value: "${{ steps.set_result.outputs.result }}"
 
 
 runs:
