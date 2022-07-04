@@ -2,7 +2,7 @@ name: is_docker_push_allowed
 description: "Checks the Github environment to determine if a Docker image can be pushed"
 
 outputs:
-  tag:
+  result:
     description: "Indicator of whether the image can be pushed"
     value: "${{ steps.set_result.outputs.value }}"
 
@@ -26,7 +26,7 @@ runs:
       shell: bash
       run: |
         if [[ ${{ steps.check_ref.outcome }} == 'success' ]]; then
-          echo "::set-output name=value::true"
+          echo "::set-output name=result::true"
         else
-          echo "::set-output name=date::false"
+          echo "::set-output name=result::false"
         fi
