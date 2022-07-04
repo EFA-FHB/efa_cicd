@@ -22,6 +22,7 @@ runs:
         TOKEN: ${{inputs.token}}
         RETAIN_MAX_DAYS: ${{inputs.retain-max-days}}
       shell: bash
-      run: |
+      run:
         tree
         ls -la
+        echo ${{toJSON(github)}}
