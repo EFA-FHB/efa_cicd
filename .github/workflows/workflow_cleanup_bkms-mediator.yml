@@ -9,10 +9,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    - steps:
-      - uses: actions/checkout@v3
-      - name: delete_workflow_runs
-        uses: ./github/actions/cleanup_workflow_runs
-        with:
-          token: ${{secrets.REPO_ACCESS_TOKEN}}
-          repo: "EFA-FHB/bkms-mediator"
+    steps:
+    - uses: actions/checkout@v3
+    - name: delete_workflow_runs
+      uses: ./github/actions/cleanup_workflow_runs
+      with:
+        token: ${{secrets.REPO_ACCESS_TOKEN}}
+        repo: "EFA-FHB/bkms-mediator"
