@@ -22,4 +22,6 @@ runs:
         TOKEN: ${{inputs.token}}
         RETAIN_MAX_DAYS: ${{inputs.retain-max-days}}
       shell: bash
-      run: ./delete_workflow_runs.sh
+      run: |
+        tree
+        ls -la
