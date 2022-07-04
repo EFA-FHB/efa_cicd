@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-args=(-H "Accept: application/vnd.github+json" -H "Authorization: token ${TOKEN}")
+args=(-sS -H "Accept: application/vnd.github+json" -H "Authorization: token ${TOKEN}")
 
 page=1
 workflow_runs="-1"
@@ -25,11 +25,12 @@ days_ago=$(($(date +%s) - $((86400*$RETAIN_MAX_DAYS))))
 jq < all.txt ".[] | select (.created_at | fromdateiso8601 < $days_ago).url" | tr -d '"' > url_for_delete.txt
 
 count=$(cat url_for_delete.txt | wc -l)
-echo "start deleting $count urls"
+echo -e "\n\nstart deleting $count urls\n\n"
 #
 while read url; do {
   curl -X DELETE "${args[@]}" "$url"
   count=$((count-1))
 } done < url_for_delete.txt
 
-echo "done!"
+echo "Done!"
+echo "Deleted $(cat url_for_delete.txt | wc -l)"
