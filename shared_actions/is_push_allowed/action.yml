@@ -16,6 +16,8 @@ runs:
       shell: bash
       continue-on-error: true
       run: |
+        echo $GITHUB_REF_NAME
+        printenv GITHUB_REF_NAME
         [[ $(printenv PUSH_IMAGE) == "true" ]] && exit 0;
         [[ $(printenv GITHUB_REF_NAME) =~ main|release/.+|tags/.+ ]] && exit 0;
         exit 1;
