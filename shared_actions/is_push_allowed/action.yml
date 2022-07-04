@@ -1,0 +1,30 @@
+name: is_docker_push_allowed
+description: "Checks the Github environment to determine if a Docker image can be pushed"
+
+outputs:
+  tag:
+    description: "Indicator of whether the image can be pushed"
+    value: "${{ steps.set_result.outputs.value }}"
+
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: check ref
+      id: check_ref
+      shell: bash
+      run: |
+        [[ $(printenv PUSH_IMAGE) == "true" ]] && exit 0;
+        echo $GITHUB_REF_NAME | grep -E "main|release/.+|tags/.+"
+
+    - name: set result
+      id: set_result
+      if: ${{always()}}
+      shell: bash
+      run: |
+        if [[ ${{ steps.check_ref.outcome }} == 'success' ]]; then
+          echo "::set-output name=value::true"
+        else
+          echo "::set-output name=date::false"
+        fi
