@@ -4,9 +4,11 @@ on:
   workflow_call:
 
 jobs:
-  runs-on: ubuntu-latest
 
   cleanup:
+
+    runs-on: ubuntu-latest
+
     - steps:
       - uses: actions/checkout@v3
       - name: delete_workflow_runs
