@@ -22,7 +22,4 @@ runs:
         TOKEN: ${{inputs.token}}
         RETAIN_MAX_DAYS: ${{inputs.retain-max-days}}
       shell: bash
-      run:
-        tree
-        ls -la
-        echo ${{toJSON(github)}}
+      run: ./${{github.action_path}}/delete_workflow_runs.sh
