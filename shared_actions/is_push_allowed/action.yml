@@ -17,7 +17,8 @@ runs:
       continue-on-error: true
       run: |
         [[ $(printenv PUSH_IMAGE) == "true" ]] && exit 0;
-        echo $GITHUB_REF_NAME | grep -E "main|release/.+|tags/.+"
+        [[ $(printenv GITHUB_REF_NAME) =~ main|release/.+|tags/.+ ]] && exit 0;
+        exit 1;
 
     - name: set result
       id: set_result
