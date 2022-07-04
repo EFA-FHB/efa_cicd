@@ -1,6 +1,6 @@
 # This workflow creates a release for the application.
 #
-name: "Cleanup"
+name: "workflow cleanup vergabesystem-adapter"
 
 on:
   workflow_dispatch:
