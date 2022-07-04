@@ -1,0 +1,16 @@
+name: "Cleanup workflow runs"
+
+on:
+  workflow_call:
+
+jobs:
+  runs-on: ubuntu-latest
+
+  cleanup:
+    - steps:
+      - uses: actions/checkout@v3
+      - name: delete_workflow_runs
+        uses: ./github/actions/cleanup_workflow_runs
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          repo: "EFA-FHB/bkms-mediator"

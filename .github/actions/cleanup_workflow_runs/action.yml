@@ -1,0 +1,25 @@
+name: delete_old_workflow_runs
+description: "Deletes old workflow run"
+
+inputs:
+  token:
+    description: "Token used for authenticating against Github Rest API"
+    required: true
+  repo:
+    description: "Name of repository"
+    required: true
+  retain-max-days:
+    description: "Number of days to keep records of workflow runs."
+    required: false
+    default: "30"
+
+runs:
+  using: "composite"
+  steps:
+    - name: delete_workflow_runs
+      env:
+        REPOSITORY: ${{inputs.repo}}
+        TOKEN: ${{inputs.token}}
+        RETAIN_MAX_DAYS: ${{inputs.retain-max-days}}
+      shell: bash
+      run: ./delete_workflow_runs.sh
