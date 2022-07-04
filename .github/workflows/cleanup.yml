@@ -1,6 +1,6 @@
 # This workflow creates a release for the application.
 #
-name: "cleanup"
+name: "Cleanup"
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: delete_workflow_runs
-        uses: ./github/actions/cleanup_workflow_runs
+        uses: ./.github/actions/cleanup_workflow_runs
         with:
           token: ${{secrets.REPO_ACCESS_TOKEN}}
           repo: "EFA-FHB/bkms-mediator"
