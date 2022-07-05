@@ -2,7 +2,7 @@
 
 Github Action to create a new release for the context repository.
 
-##Inputs 
+## Inputs 
 
 ### `gpg_private_key`
 **Required** GPG private key for commit and tag signing
