@@ -84,7 +84,10 @@ runs:
       shell: bash
       id: build_image
       run: |
-        echo ${{steps.meta.outputs.json}} > meta.json
+        cat <<EOF > meta.json
+        ${{steps.meta.outputs.json}}
+        EOF
+        
         cat meta.json | jq ".tags[0]"
 
 
