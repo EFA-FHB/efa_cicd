@@ -89,7 +89,7 @@ runs:
       id: build_image
       run: |
         echo ${{steps.meta.outputs.json}} > meta.json
-        image=$(jq .tags[0] < meta.json | tr -d '"')
+        jq .tags[0] < meta.json | tr -d '"' > image
         jq .labels < meta.json \
           | tr -d '{} ' \
           | grep -v "^$" \
@@ -97,15 +97,16 @@ runs:
           | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
           | tr -d "," > labels
 
+        image=$(cat image)
         echo "dockerfilePath => ${{inputs.dockerfilePath}}"
         echo "context => ${{inputs.context}}"
         echo "docker_image => ${image}"
 
         cmd="docker build "
-        while read label; do { cmd="${cmd} --label $label ";  } done < labels
+        while read label; do { cmd="${cmd} --label $label";  } done < labels
 
-        cmd="${cmd} -f ${{ inputs.dockerfilePath }} "
-        cmd="${cmd} -t ${{ image }} "
+        cmd="${cmd} -f ${{ inputs.dockerfilePath }}"
+        cmd="${cmd} -t ${{ image }}"
         cmd="${cmd} ${{ inputs.context }}"
 
         $cmd
