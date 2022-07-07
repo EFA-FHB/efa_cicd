@@ -79,18 +79,14 @@ runs:
         tags: |
           type=raw,value=${{env.tag}}
 
-    - name: Capture metadata
-      id: meta_json
+    - name: Build Docker Image
+      id: build_image
       shell: bash
       run: |
         cat <<EOF > meta.json
           ${{steps.meta.outputs.json}}
         EOF
 
-    - name: Build Docker Image
-      id: build_image
-      shell: bash
-      run: |
         image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
         echo "::set-output name=image::${image}"
         cat meta.json | jq ".labels" \
@@ -107,41 +103,10 @@ runs:
         cmd="$cmd -t $image"
         cmd="$cmd ${{ inputs.context }}"
 
+        echo "$cmd"
         $cmd
 
         echo "::set-output name=docker_image::${image}"
-
-#    - name: Build Docker Image
-#      if: false
-#      shell: bash
-#      id: build_image
-#      env:
-#        image: ${{steps.meta_image.outputs.image}}
-#      run: |
-#        image=${{env.image}}
-#
-#        jq .labels < meta.json \
-#          | tr -d '{} ' \
-#          | grep -v "^$" \
-#          | sed 's/:/=/' \
-#          | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
-#          | tr -d "," > labels
-#
-#        echo "dockerfilePath => ${{inputs.dockerfilePath}}"
-#        echo "context => ${{inputs.context}}"
-#        echo "docker_image => ${image}"
-#
-#        cmd="docker build"
-##        while read label; do { cmd="${cmd} --label $label";  } done < labels
-#
-#        cmd="${cmd} -f ${{ inputs.dockerfilePath }} "
-#        cmd="${cmd} -t ${{ image }} "
-#        cmd="${cmd} ${{ inputs.context }}"
-#
-#        $cmd
-#
-#        echo "::set-output name=docker_image::${image}"
-
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}
