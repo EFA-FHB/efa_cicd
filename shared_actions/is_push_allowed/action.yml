@@ -4,7 +4,7 @@ description: "Checks the Github environment to determine if a Docker image can b
 outputs:
   result:
     description: "Indicator of whether the image can be pushed"
-    value: "${{ steps.set_result.outputs.result }}"
+    value: "${{ steps.check_ref.outputs.result }}"
 
 
 runs:
@@ -16,9 +16,10 @@ runs:
       shell: bash
       continue-on-error: true
       run: |
-        [[ $(printenv PUSH_IMAGE) == "true" ]] && exit 0;
-        [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]] && exit 0;
-        exit 1;
+        result=false
+        [[ $(printenv PUSH_IMAGE) == "true" ]] && result=true;
+        [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]] && result=true;
+        echo "::set-output name=result::$result"
 
     - name: set result
       id: set_result
