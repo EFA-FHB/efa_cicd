@@ -89,8 +89,8 @@ runs:
       id: build_image
       run: |
         echo ${{steps.meta.outputs.json}} > meta.json
-        docker_image=$(jq .tags[0] < output.json | tr -d '"')
-        jq .labels < output.json \
+        docker_image=$(jq .tags[0] < meta.json | tr -d '"')
+        jq .labels < meta.json \
           | tr -d '{} ' \
           | grep -v "^$" \
           | sed 's/:/=/' \
