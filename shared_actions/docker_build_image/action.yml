@@ -57,7 +57,7 @@ runs:
         branch: ${{github.head_ref || github.ref_name}}
         version: ${{steps.version.outputs.version}}
       run: |
-        version=$(echo ${{env.version}} | sed 's/-SNAPSHOT//'
+        version=$(echo ${{env.version}} | sed 's/-SNAPSHOT//')
         if [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]]; then
           [[ "${{env.version}}" =~ SNAPSHOT ]] && tag="${version}-beta" || tag="${version}"
         else
