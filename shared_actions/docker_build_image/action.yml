@@ -88,32 +88,37 @@ runs:
       shell: bash
       id: build_image
       run: |
-
-        branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
-
-        tag="${{ steps.version.outputs.version }}"
-
-        [[ ! ${branchName} =~ release|main ]] && {
-          normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
-          tag="${tag}-${normalized_branch_name}"
-        }
-
-        tag="${tag}-${{ github.run_number }}"
-
-        docker_image="${{ inputs.image }}:${tag}"
+        echo ${{steps.meta.outputs.json}} > meta.json
+        docker_image=$(jq .tags[0] < output.json | tr -d '"')
+        jq .labels < output.json \
+          | tr -d '{} ' \
+          | grep -v "^$" \
+          | sed 's/:/=/' \
+          | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
+          | tr -d "," > labels
 
         echo "dockerfilePath => ${{inputs.dockerfilePath}}"
         echo "context => ${{inputs.context}}"
         echo "docker_image => ${docker_image}"
 
-        docker build \
-          --label org.label-schema.name="${{ inputs.image }}" \
-          --label org.label-schema.version="${tag}" \
-          --label org.label-schema.vcs-ref="${{github.sha}}" \
-          --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
-          -f "${{ inputs.dockerfilePath }}" \
-          -t ${docker_image} \
-          "${{inputs.context}}"
+        cmd="docker build "
+        while read label; do { cmd="${cmd} --label $label ";  } done < labels
+
+        cmd="${cmd} -f ${{ inputs.dockerfilePath }} "
+        cmd="${cmd} -t ${{ docker_image }} "
+        cmd="${cmd} ${{ inputs.context }}"
+
+        $cmd
+
+
+        #docker build \
+        #  --label org.label-schema.name="${{ inputs.image }}" \
+        #  --label org.label-schema.version="${tag}" \
+        #  --label org.label-schema.vcs-ref="${{github.sha}}" \
+        #  --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
+        #  -f "${{ inputs.dockerfilePath }}" \
+        #  -t ${docker_image} \
+        #  "${{inputs.context}}"
 
         echo "::set-output name=docker_image::${docker_image}"
 
