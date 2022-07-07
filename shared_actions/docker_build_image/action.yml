@@ -79,11 +79,6 @@ runs:
         tags: |
           type=raw,value=${{env.tag}}
 
-    - name: echo meta
-      shell: bash
-      run: |
-        echo ${{steps.meta.outputs.json}}
-
     - name: Build Docker Image
       shell: bash
       id: build_image
