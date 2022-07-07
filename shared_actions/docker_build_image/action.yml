@@ -93,6 +93,14 @@ runs:
       run: |
         image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
         echo "::set-output name=image::${image}"
+        cat meta.json | jq ".labels" \
+                  | tr -d '{} ' \
+                  | grep -v "^$" \
+                  | sed 's/:/=/' \
+                  | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
+                  | tr -d "," > labels
+
+         cat labels
 
 #    - name: Build Docker Image
 #      if: false
