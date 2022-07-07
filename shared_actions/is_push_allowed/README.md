@@ -1,20 +1,24 @@
-## docker_push_image
+## is_push_allowed
 
-This action pushes a given image to a registry.
+This action checks inspects specific env vars to determine whether a Docker image can be pushed.
 
+The action returns an output field `result` which returns `true` if
+- `$GITHUB_REF` points to branch `refs/heads/main`
+- `$GITHUB_REF` points to a branch `refs/heads/release/**`
+- `$GITHUB_REF` points to tag `refs/tags/**`
+- `$PUSH_IMAGE` resolves to `true`
+
+Otherwise, `result` returns `false`.
 ## Inputs
 
-### `imageid`
-**Required** Reference of the docker image to push
-
-### `tag-file-name`
-**Required** Name of the file to upload after the docker image was successfully pushed. 
-The file will be uploaded to github using [actions/upload-artifact](https://github.com/actions/upload-artifact) Github action.  
-The file will contain the name of all tags from which the newly referenced image is retrievable.
+None 
 
 ## Outputs
-###tag
-Tag of the pushed docker image
+
+### `result (boolean)`
+
+Indicator of whether a docker image produced during a worklow run which executes this action 
+can be pushed to a container registry.
 
 ## Usage
 

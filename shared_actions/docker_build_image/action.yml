@@ -37,7 +37,7 @@ runs:
         echo "::set-output name=date::$(date --rfc-3339=seconds)"
 
     - name: current version
-      id: current_version
+      id: version
       shell: bash
       run: |
 
@@ -50,38 +50,66 @@ runs:
 
         echo "::set-output name=version::$version"
 
-    - name: Build Docker Image
+    - name: Docker tag
+      id: tag
       shell: bash
-      id: build_image
+      env:
+        branch: ${{github.head_ref || github.ref_name}}
+        version: ${{steps.version.outputs.version}}
       run: |
-
-        branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
-
-        tag="${{ steps.current_version.outputs.version }}"
-
-        [[ ! ${branchName} =~ release|main ]] && {
-          normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
-          tag="${tag}-${normalized_branch_name}"
-        }
+        version=$(echo ${{env.version}} | sed 's/-SNAPSHOT//')
+        if [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]]; then
+          [[ "${{env.version}}" =~ SNAPSHOT ]] && tag="${version}-beta" || tag="${version}"
+        else
+          branch=$(echo ${{env.branch}} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
+          tag="${version}-${branch}"
+        fi
 
         tag="${tag}-${{ github.run_number }}"
 
-        docker_image="${{ inputs.image }}:${tag}"
+        echo "::set-output name=tag::${tag}"
 
-        echo "dockerfilePath => ${{inputs.dockerfilePath}}"
-        echo "context => ${{inputs.context}}"
-        echo "docker_image => ${docker_image}"
+    - name: Docker meta
+      uses: docker/metadata-action@v4
+      id: meta
+      env:
+        tag: ${{steps.tag.outputs.tag}}
+      with:
+        images: ${{inputs.image}}
+        tags: |
+          type=raw,value=${{env.tag}}
 
-        docker build \
-          --label org.label-schema.name="${{ inputs.image }}" \
-          --label org.label-schema.version="${tag}" \
-          --label org.label-schema.vcs-ref="${{github.sha}}" \
-          --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
-          -f "${{ inputs.dockerfilePath }}" \
-          -t ${docker_image} \
-          "${{inputs.context}}"
+    - name: Build Docker Image
+      id: build_image
+      shell: bash
+      run: |
+        cat <<EOF > meta.json
+          ${{steps.meta.outputs.json}}
+        EOF
 
-        echo "::set-output name=docker_image::${docker_image}"
+        image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
+        echo "::set-output name=image::${image}"
+        cat meta.json | jq ".labels" \
+                  | tr -d '{} ' \
+                  | grep -v "^$" \
+                  | sed 's/:/=/' \
+                  | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
+                  | tr -d "," > labels
+
+
+        cmd="docker build"
+        while read label; do { cmd="${cmd} --label $label";  } done < labels
+
+        cmd="$cmd --label org.label-schema.vcs-ref="${{github.sha}}""
+
+        cmd="$cmd -f ${{ inputs.dockerfilePath }}"
+        cmd="$cmd -t $image"
+        cmd="$cmd ${{ inputs.context }}"
+
+        echo "$cmd"
+        $cmd
+
+        echo "::set-output name=docker_image::${image}"
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}
