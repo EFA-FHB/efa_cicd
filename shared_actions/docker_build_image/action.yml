@@ -50,6 +50,17 @@ runs:
 
         echo "::set-output name=version::$version"
 
+    - name: Docker meta
+      uses: docker/metadata-action@v4
+      id: meta
+      with:
+        images: ${{inputs.image}}
+
+    - name: echo meta
+      shell: bash
+      run: |
+        echo ${{steps.meta.outputs.json}}
+
     - name: Build Docker Image
       shell: bash
       id: build_image
