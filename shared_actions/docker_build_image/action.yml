@@ -89,17 +89,17 @@ runs:
       id: build_image
       run: |
 
-#    branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
-#
-#    tag="${{ steps.version.outputs.version }}"
-#
-#    [[ ! ${branchName} =~ release|main ]] && {
-#      normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
-#      tag="${tag}-${normalized_branch_name}"
-#    }
-#
-#    tag="${tag}-${{ github.run_number }}"
-#
+        branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
+
+        tag="${{ steps.version.outputs.version }}"
+
+        [[ ! ${branchName} =~ release|main ]] && {
+          normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
+          tag="${tag}-${normalized_branch_name}"
+        }
+
+        tag="${tag}-${{ github.run_number }}"
+
         docker_image="${{ inputs.image }}:${tag}"
 
         echo "dockerfilePath => ${{inputs.dockerfilePath}}"
