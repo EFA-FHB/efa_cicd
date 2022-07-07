@@ -89,7 +89,7 @@ runs:
       id: build_image
       run: |
         echo ${{steps.meta.outputs.json}} > meta.json
-        docker_image=$(jq .tags[0] < meta.json | tr -d '"')
+        image=$(jq .tags[0] < meta.json | tr -d '"')
         jq .labels < meta.json \
           | tr -d '{} ' \
           | grep -v "^$" \
@@ -99,28 +99,18 @@ runs:
 
         echo "dockerfilePath => ${{inputs.dockerfilePath}}"
         echo "context => ${{inputs.context}}"
-        echo "docker_image => ${docker_image}"
+        echo "docker_image => ${image}"
 
         cmd="docker build "
         while read label; do { cmd="${cmd} --label $label ";  } done < labels
 
         cmd="${cmd} -f ${{ inputs.dockerfilePath }} "
-        cmd="${cmd} -t ${{ docker_image }} "
+        cmd="${cmd} -t ${{ image }} "
         cmd="${cmd} ${{ inputs.context }}"
 
         $cmd
 
-
-        #docker build \
-        #  --label org.label-schema.name="${{ inputs.image }}" \
-        #  --label org.label-schema.version="${tag}" \
-        #  --label org.label-schema.vcs-ref="${{github.sha}}" \
-        #  --label org.label-schema.build-date="${{ steps.current_date.outputs.date }}" \
-        #  -f "${{ inputs.dockerfilePath }}" \
-        #  -t ${docker_image} \
-        #  "${{inputs.context}}"
-
-        echo "::set-output name=docker_image::${docker_image}"
+        echo "::set-output name=docker_image::${image}"
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}
