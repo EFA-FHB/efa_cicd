@@ -79,15 +79,30 @@ runs:
         tags: |
           type=raw,value=${{env.tag}}
 
-    - name: Build Docker Image
+    - name: Capture metadata
+      id: meta_json
       shell: bash
-      id: build_image
       run: |
         cat <<EOF > meta.json
-        ${{steps.meta.outputs.json}}
+          ${{steps.meta.outputs.json}}
         EOF
 
+    - name: Image name
+      id: meta_image
+      shell: bash
+      run: |
         image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
+        echo "::set-output name=image::${image}"
+
+    - name: Build Docker Image
+      if: false
+      shell: bash
+      id: build_image
+      env:
+        image: ${{steps.meta_image.outputs.image}}
+      run: |
+        image=${{env.image}}
+
         jq .labels < meta.json \
           | tr -d '{} ' \
           | grep -v "^$" \
@@ -100,7 +115,7 @@ runs:
         echo "docker_image => ${image}"
 
         cmd="docker build"
-        while read label; do { cmd="${cmd} --label $label";  } done < labels
+#        while read label; do { cmd="${cmd} --label $label";  } done < labels
 
         cmd="${cmd} -f ${{ inputs.dockerfilePath }} "
         cmd="${cmd} -t ${{ image }} "
