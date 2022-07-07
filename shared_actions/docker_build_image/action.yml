@@ -37,7 +37,7 @@ runs:
         echo "::set-output name=date::$(date --rfc-3339=seconds)"
 
     - name: current version
-      id: current_version
+      id: version
       shell: bash
       run: |
 
@@ -50,11 +50,34 @@ runs:
 
         echo "::set-output name=version::$version"
 
+    - name: Docker tag
+      id: tag
+      shell: bash
+      env:
+        branch: ${{github.head_ref || github.ref_name}}
+        version: ${{steps.version.outputs.version}}
+      run: |
+        version=$(echo ${{env.version}} | sed 's/-SNAPSHOT//'
+        if [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]]; then
+          [[ "${{env.version}}" =~ SNAPSHOT ]] && tag="${version}-beta" || tag="${version}"
+        else
+          branch=$(echo ${{env.branch}} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
+          tag="${version}-${branch}"
+        fi
+
+        tag="${tag}-${{ github.run_number }}"
+
+        echo "::set-output name=tag::${tag}"
+
     - name: Docker meta
       uses: docker/metadata-action@v4
       id: meta
+      env:
+        tag: ${{steps.tag.outputs.tag}}
       with:
         images: ${{inputs.image}}
+        tags: |
+          type=raw,value=${{env.tag}}
 
     - name: echo meta
       shell: bash
@@ -66,17 +89,17 @@ runs:
       id: build_image
       run: |
 
-        branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
-
-        tag="${{ steps.current_version.outputs.version }}"
-
-        [[ ! ${branchName} =~ release|main ]] && {
-          normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
-          tag="${tag}-${normalized_branch_name}"
-        }
-
-        tag="${tag}-${{ github.run_number }}"
-
+#    branchName=$(echo "${{github.ref}}" | cut -d"/" -f3-)
+#
+#    tag="${{ steps.version.outputs.version }}"
+#
+#    [[ ! ${branchName} =~ release|main ]] && {
+#      normalized_branch_name=$( echo ${branchName} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
+#      tag="${tag}-${normalized_branch_name}"
+#    }
+#
+#    tag="${tag}-${{ github.run_number }}"
+#
         docker_image="${{ inputs.image }}:${tag}"
 
         echo "dockerfilePath => ${{inputs.dockerfilePath}}"
