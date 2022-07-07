@@ -80,12 +80,12 @@ runs:
           type=raw,value=${{env.tag}}
 
     - name: Build Docker Image
+
       shell: bash
       id: build_image
       run: |
         echo ${{steps.meta.outputs.json}} > meta.json
-        cat meta.json | jq .tags[0] > image
-        cat image
+        cat meta.json | jq ".tags[0]"
 
 
     - name: Scan image for vulnerabilities
