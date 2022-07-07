@@ -104,7 +104,7 @@ runs:
         while read label; do { cmd="${cmd} --label $label";  } done < labels
 
         cmd="${cmd} -f ${{ inputs.dockerfilePath }} "
-        cmd="${cmd} -t ${{ image }} "
+        cmd="${cmd} -t ${ image } "
         cmd="${cmd} ${{ inputs.context }}"
 
         $cmd
