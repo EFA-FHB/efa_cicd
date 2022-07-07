@@ -89,29 +89,30 @@ runs:
       id: build_image
       run: |
         echo ${{steps.meta.outputs.json}} > meta.json
-        jq .tags[0] < meta.json | tr -d '"' > image
-        jq .labels < meta.json \
-          | tr -d '{} ' \
-          | grep -v "^$" \
-          | sed 's/:/=/' \
-          | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
-          | tr -d "," > labels
-
-        image=$(cat image)
-        echo "dockerfilePath => ${{inputs.dockerfilePath}}"
-        echo "context => ${{inputs.context}}"
-        echo "docker_image => ${image}"
-
-        cmd="docker build "
-        while read label; do { cmd="${cmd} --label $label";  } done < labels
-
-        cmd="${cmd} -f ${{ inputs.dockerfilePath }}"
-        cmd="${cmd} -t ${{ image }}"
-        cmd="${cmd} ${{ inputs.context }}"
-
-        $cmd
-
-        echo "::set-output name=docker_image::${image}"
+        cat meta.json
+        #jq .tags[0] < meta.json | tr -d '"' > image
+        #jq .labels < meta.json \
+        #  | tr -d '{} ' \
+        #  | grep -v "^$" \
+        #  | sed 's/:/=/' \
+        #  | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
+        #  | tr -d "," > labels
+        #
+        #image=$(cat image)
+        #echo "dockerfilePath => ${{inputs.dockerfilePath}}"
+        #echo "context => ${{inputs.context}}"
+        #echo "docker_image => ${image}"
+        #
+        #cmd="docker build "
+        #while read label; do { cmd="${cmd} --label $label";  } done < labels
+        #
+        #cmd="${cmd} -f ${{ inputs.dockerfilePath }}"
+        #cmd="${cmd} -t ${{ image }}"
+        #cmd="${cmd} ${{ inputs.context }}"
+        #
+        #$cmd
+        #
+        #echo "::set-output name=docker_image::${image}"
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}
