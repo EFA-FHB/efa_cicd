@@ -78,7 +78,7 @@ runs:
         fi
 
         if [[ "${{env.versionFile}}" == "package.json" ]]; then
-          sed -i -E "s/(\"version\": ).*/\1\"${{newVersion}}\" /" ${{env.versionFile}}
+          sed -i -E "s/(\"version\": ).*/\1\"${{env.newVersion}}\" /" ${{env.versionFile}}
         fi
 
         git commit -S -m "[github] update version" -- ${{env.versionFile}} &> /dev/null
