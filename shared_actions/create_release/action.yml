@@ -74,11 +74,11 @@ runs:
       run: |
 
         if [[ "${{env.versionFile}}" == "gradle.properties" ]]; then
-          sed -i -E "s/(version=).*/\1${{env.prevVersion}}/" ${{env.versionFile}}
+          sed -i -E "s/(version=).*/\1${{env.newVersion}}/" ${{env.versionFile}}
         fi
 
         if [[ "${{env.versionFile}}" == "package.json" ]]; then
-          sed -i -E "s/(\"version\": ).*/\1\"${{env.prevVersion}}\" /" ${{env.versionFile}}
+          sed -i -E "s/(\"version\": ).*/\1\"${{new.prevVersion}}\" /" ${{env.versionFile}}
         fi
 
         git commit -S -m "[github] update version" -- ${{env.versionFile}} &> /dev/null
@@ -102,7 +102,7 @@ runs:
       shell: bash
       run: |
         IFS="." read -r -a parts <<< "${{env.version}}"
-        declare -A idxs=([major]=0, [minor]=1, [patch]=2)
+        declare -A idxs=([major]=0 [minor]=1 [patch]=2)
         idx=${idxs[${{env.release_type}}]}
         parts[$idx]=$((${parts[$idx]}+1))
         version="$(echo ${parts[*]} | tr ' ' '.')-SNAPSHOT"
