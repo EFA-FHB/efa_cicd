@@ -65,6 +65,7 @@ runs:
       if: always() # always run even if the previous step fails
       with:
         report_paths: '**/build/test-results/test/TEST-*.xml'
+        annotate_only: true
 
     - name: XRAY - Create xray-info.json
       if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
