@@ -95,34 +95,6 @@ runs:
         envsubst  < xray-info-json.tpl > xray-info.json
         cat xray-info.json
 
-    - name: XRAY - Create xray-info.json
-      if: false
-      shell: bash
-      run: |
-        export XRAY_END_DATE=$(date +%Y-%m-%dT%R:%S.000%z)
-
-        cat > xray-info-json.tpl <<EOF
-        {
-          "fields": {
-              "project": {
-                    "key": "$XRAY_PROJECT_KEY"
-                },
-                "summary": "Automatic Test execution",
-                "issuetype": {
-                    "id": "11702"
-                },
-                "customfield_21317": "$XRAY_BEGIN_DATE",
-                "customfield_21318": "$XRAY_END_DATE",
-                "customfield_21319": "$XRAY_REVISION",
-                "customfield_21327": ["$XRAY_TESTPLAN_KEY"],
-                "customfield_21325": ["Github"]
-          }
-        }
-        EOF
-
-        envsubst  < xray-info-json.tpl > xray-info.json
-        cat xray-info.json
-
     - name: XRAY - send results to JIRA
       if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
       uses: mikepenz/xray-action@v2.3.0
