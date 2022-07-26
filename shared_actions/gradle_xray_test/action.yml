@@ -68,32 +68,32 @@ runs:
         annotate_only: true
 
     - name: XRAY - Create xray-info.json - test
-        if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
-        shell: bash
-        run: |
-          export XRAY_END_DATE=$(date +%Y-%m-%dT%R:%S.000%z)
+      if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
+      shell: bash
+      run: |
+        export XRAY_END_DATE=$(date +%Y-%m-%dT%R:%S.000%z)
 
-          cat > xray-info-json.tpl <<EOF
-          {
-            "fields": {
-                "project": {
-                      "id": "48300"
-                  },
-                  "summary": "Automatic Test execution",
-                  "issuetype": {
-                      "id": "11702"
-                  },
-                  "customfield_21317": "$XRAY_BEGIN_DATE",
-                  "customfield_21318": "$XRAY_END_DATE",
-                  "customfield_21319": "$XRAY_REVISION",
-                  "customfield_21327": ["$XRAY_TESTPLAN_KEY"],
-                  "customfield_21325": ["Github"]
-            }
+        cat > xray-info-json.tpl <<EOF
+        {
+          "fields": {
+              "project": {
+                    "id": "48300"
+                },
+                "summary": "Automatic Test execution",
+                "issuetype": {
+                    "id": "11702"
+                },
+                "customfield_21317": "$XRAY_BEGIN_DATE",
+                "customfield_21318": "$XRAY_END_DATE",
+                "customfield_21319": "$XRAY_REVISION",
+                "customfield_21327": ["$XRAY_TESTPLAN_KEY"],
+                "customfield_21325": ["Github"]
           }
-          EOF
+        }
+        EOF
 
-          envsubst  < xray-info-json.tpl > xray-info.json
-          cat xray-info.json
+        envsubst  < xray-info-json.tpl > xray-info.json
+        cat xray-info.json
 
     - name: XRAY - Create xray-info.json
       if: false
