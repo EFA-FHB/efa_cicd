@@ -47,7 +47,7 @@ runs:
             version=$(echo $version | sed -E 's/"version":\s*"(.+)".*/\1/')
           else
             version=$(echo $version | sed -E 's/version=(.+)/\1/')
-          if
+          fi
 
           if [[ -n $version ]]; then
             break;
