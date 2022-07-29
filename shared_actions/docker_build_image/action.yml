@@ -42,7 +42,13 @@ runs:
       run: |
 
         for file in package.json gradle.properties; do {
-          version=$(find . -maxdepth 1 -name $file -exec sh -c 'grep -E "version" {} | cut -d ":" -f2 | tr -cd "0-9\."' \;)
+          version=$(find . -maxdepth 1 -name $file -exec sh -c 'grep -E "version" {}' \;)
+          if [[ "$file" == "package.json" ]]; then
+            version=$(echo $version | sed -E 's/"version":\s*"(.+)".*/\1/')
+          else
+            version=$(echo $version | sed -E 's/version=(.+)/\1/')
+          fi
+
           if [[ -n $version ]]; then
             break;
           fi
