@@ -67,7 +67,7 @@ runs:
         if [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]]; then
           [[ "${{env.version}}" =~ SNAPSHOT ]] && tag="${version}-beta" || tag="${version}"
         else
-          branch=$(echo ${{env.branch}} | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
+          branch=$(echo "${{env.branch}}" | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
           tag="${version}-${branch}"
         fi
 
