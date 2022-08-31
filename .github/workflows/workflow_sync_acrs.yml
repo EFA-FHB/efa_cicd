@@ -19,4 +19,4 @@ jobs:
           creds: ${{ secrets.AZURE_EFA_FHB_SP_CREDS }}
 
       - run: |
-          az webapp list --query "[?state=='Running']"
+          az account list
