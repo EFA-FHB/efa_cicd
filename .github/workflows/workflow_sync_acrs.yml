@@ -35,10 +35,10 @@ jobs:
 
             [[ "$type" == "new" ]] && {
               subscr_id=${{env.NEW_ACR_SUBSCRIPTION_ID}}
-              acr_name=${{env.OLD_ACR_RESOURCE_NAME}}
+              acr_name=${{env.NEW_ACR_RESOURCE_NAME}}
             } || {
               subscr_id=${{env.OLD_ACR_SUBSCRIPTION_ID}}
-              acr_name=${{env.NEW_ACR_RESOURCE_NAME}}
+              acr_name=${{env.OLD_ACR_RESOURCE_NAME}}
             }
 
             az account set -n $subscr_id
