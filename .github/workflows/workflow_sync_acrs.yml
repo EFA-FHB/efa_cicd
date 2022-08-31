@@ -34,11 +34,11 @@ jobs:
           for type in old new; do {
 
             [[ "$type" == "new" ]] && {
-              subscr_id=${{env.NEW_ACR_SUBSCRIPTION_ID}}
-              acr_name=${{env.NEW_ACR_RESOURCE_NAME}}
+              subscr_id=$(echo ${{env.NEW_ACR_SUBSCRIPTION_ID}})
+              acr_name=$(echo ${{env.NEW_ACR_RESOURCE_NAME}})
             } || {
-              subscr_id=${{env.OLD_ACR_SUBSCRIPTION_ID}}
-              acr_name=${{env.OLD_ACR_RESOURCE_NAME}}
+              subscr_id=$(echo ${{env.OLD_ACR_SUBSCRIPTION_ID}})
+              acr_name=$(echo ${{env.OLD_ACR_RESOURCE_NAME}})
             }
 
             az account set -n $subscr_id
