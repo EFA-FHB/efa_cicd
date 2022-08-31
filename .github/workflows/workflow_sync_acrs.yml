@@ -1,0 +1,22 @@
+# This workflow creates a release for the application.
+#
+name: "Sync container registries"
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_EFA_FHB_SP_CREDS }}
+
+      - run: |
+          az webapp list --query "[?state=='Running']"
