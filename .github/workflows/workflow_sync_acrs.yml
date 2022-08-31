@@ -31,25 +31,38 @@ jobs:
         shell: bash
         run: |
 
-          az account set -n ${{env.OLD_ACR_SUBSCRIPTION_ID}}
+          for type in old new; do {
 
-          repos=$(az acr repository list -n ${{env.OLD_ACR_RESOURCE_NAME}} | jq .[] | tr -d '"')
+            [[ "$type" == "new" ]] && {
+              subscr_id=${{env.NEW_ACR_SUBSCRIPTION_ID}}
+              acr_name=${{env.OLD_ACR_RESOURCE_NAME}}
+            } || {
+              subscr_id=${{env.OLD_ACR_SUBSCRIPTION_ID}}
+              acr_name=${{env.NEW_ACR_RESOURCE_NAME}}
+            }
 
-          for repo in $repos; do {
-            echo "Fetching tags for repo $repo..."
-            tags=$(az acr repository show-tags -n ${{env.OLD_ACR_RESOURCE_NAME}} --repository $repo | jq .[] | tr -d '"')
-            echo "$repo:$tag" >> images_to_sync.txt
-            echo "Preparing sync for image: $(tail -1 image_to_sync.txt)"
+            az account set -n $subscr_id
 
-              az acr import \
-                --name ${{env.NEW_ACR_NAME}} \
-                --source $repo:$tag \
-                --image $repo:$tag \
-                --registry /subscriptions/${{env.OLD_ACR_SUBSCRIPTION_ID}}/resourceGroups/${{env.OLD_ACR_RESOURCE_GROUP}}/providers/Microsoft.ContainerRegistry/registries/${{env.OLD_ACR_RESOURCE_NAME}}
+            repos=$(az acr repository list -n "$acr_name" | jq .[] | tr -d '"')
+
+            for repo in $repos; do {
+              echo "Fetching tags for repo $repo..."
+              tags=$(az acr repository show-tags -n "$acr_name" --repository $repo | jq .[] | tr -d '"')
+              for tag in $tags; do
+                echo "$repo:$tag" >> "$type"_images.txt
+                echo "Preparing sync for image: $(tail -1 "$type"_images.txt)"
+              } done
 
             } done
 
           } done
+
+          while read -r -a image; do {
+            grep -E "$image" new_images.txt -q
+            [[ $(echo $?) -eq 0 ]] && echo $image >> images_to_sync.txt
+          } done << old_images.txt
+
+
 
       - name: sync images
         shell: bash
