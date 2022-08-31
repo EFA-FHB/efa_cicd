@@ -5,9 +5,18 @@ name: "Sync container registries"
 on:
   workflow_dispatch:
 
+env:
+  OLD_ACR_SUBSCRIPTION_ID: 1d49c337-1058-4fe0-997f-fb7263956e13
+  OLD_ACR_RESOURCE_GROUP: efa-bremen-oeffentliche-vergabe
+  OLD_ACR_RESOURCE_NAME: efabremenoeffentlichevergabedev
+  NEW_ACR_SUBSCRIPTION_ID: 006eefc2-3b28-4a09-80e1-b8d6f23584d2
+  NEW_ACR_RESOURCE_GROUP: efa-fhb
+  NEW_ACR_NAME: efafhb
+
+
 jobs:
 
-  sync:
+  sync_acr_images:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,5 +27,46 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_EFA_FHB_SP_CREDS }}
 
-      - run: |
-          az account list
+      - name: get images to sync
+        shell: bash
+        run: |
+
+          az account set -n ${{env.OLD_ACR_SUBSCRIPTION_ID}}
+
+          repos=$(az acr repository list -n ${{env.OLD_ACR_RESOURCE_NAME}} | jq .[] | tr -d '"')
+
+          for repo in $repos; do {
+            echo "Fetching tags for repo $repo..."
+            tags=$(az acr repository show-tags -n ${{env.OLD_ACR_RESOURCE_NAME}} --repository $repo | jq .[] | tr -d '"')
+            echo "$repo:$tag" >> images_to_sync.txt
+            echo "Preparing sync for image: $(tail -1 image_to_sync.txt)"
+
+              az acr import \
+                --name ${{env.NEW_ACR_NAME}} \
+                --source $repo:$tag \
+                --image $repo:$tag \
+                --registry /subscriptions/${{env.OLD_ACR_SUBSCRIPTION_ID}}/resourceGroups/${{env.OLD_ACR_RESOURCE_GROUP}}/providers/Microsoft.ContainerRegistry/registries/${{env.OLD_ACR_RESOURCE_NAME}}
+
+            } done
+
+          } done
+
+      - name: sync images
+        shell: bash
+        run: |
+          az account set -n ${{env.NEW_ACR_SUBSCRIPTION_ID}}
+
+          n=0;
+          while read -r -a image; do {
+            echo "Importing image $image to ${{env.NEW_ACR_NAME}}"
+            az acr import \
+               --name ${{env.NEW_ACR_NAME}} \
+               --source $repo:$tag \
+               --image $repo:$tag \
+               --registry /subscriptions/${{env.OLD_ACR_SUBSCRIPTION_ID}}/resourceGroups/${{env.OLD_ACR_RESOURCE_GROUP}}/providers/Microsoft.ContainerRegistry/registries/${{env.OLD_ACR_RESOURCE_NAME}}
+            n=$(($n + 1));
+            echo "Import done for $image"
+          } << done images_to_sync.txt
+
+          echo "Total count of imported tags: $n"
+
