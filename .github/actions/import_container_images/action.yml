@@ -1,5 +1,5 @@
-name: delete_old_workflow_runs
-description: "Deletes old workflow run"
+name: import_container_images
+description: "Fetches a list of container images from one container registry and imports them to another"
 
 inputs:
   token:
@@ -14,9 +14,8 @@ inputs:
     default: "30"
 
 runs:
-  using: "composite"
   steps:
-    - name: delete_workflow_runs
+    - name: import_container_images
       env:
         REPOSITORY: ${{inputs.repo}}
         TOKEN: ${{inputs.token}}

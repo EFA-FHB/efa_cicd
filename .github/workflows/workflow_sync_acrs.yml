@@ -5,18 +5,10 @@ name: "Sync container registries"
 on:
   workflow_dispatch:
 
-env:
-  OLD_ACR_SUBSCRIPTION_ID: 1d49c337-1058-4fe0-997f-fb7263956e13
-  OLD_ACR_RESOURCE_GROUP: efa-bremen-oeffentliche-vergabe
-  OLD_ACR_RESOURCE_NAME: efabremenoeffentlichevergabedev
-  NEW_ACR_SUBSCRIPTION_ID: 006eefc2-3b28-4a09-80e1-b8d6f23584d2
-  NEW_ACR_RESOURCE_GROUP: efa-fhb
-  NEW_ACR_RESOURCE_NAME: efafhb
-
-
 jobs:
 
   sync_acr_images:
+
     runs-on: ubuntu-latest
 
     steps:
@@ -27,59 +19,12 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_EFA_FHB_SP_CREDS }}
 
-      - name: get images to sync
-        shell: bash
-        run: |
-
-          for type in old new; do {
-
-            if [[ "$type" == "new" ]]; then
-              subscr_id=$(echo ${{env.NEW_ACR_SUBSCRIPTION_ID}})
-              acr_name=$(echo ${{env.NEW_ACR_RESOURCE_NAME}})
-            else
-              subscr_id=$(echo ${{env.OLD_ACR_SUBSCRIPTION_ID}})
-              acr_name=$(echo ${{env.OLD_ACR_RESOURCE_NAME}})
-            fi
-
-            az account set -n $subscr_id
-
-            repos=$(az acr repository list -n "$acr_name" | jq .[] | tr -d '"')
-
-            for repo in $repos; do {
-              echo "Fetching tags for repo $repo..."
-              tags=$(az acr repository show-tags -n "$acr_name" --repository $repo | jq .[] | tr -d '"')
-              for tag in $tags; do
-                echo "$repo:$tag" >> "$type"_images.txt
-                echo "Preparing sync for image: $(tail -1 "$type"_images.txt)"
-              } done
-
-            } done
-
-          } done
-
-          while read -r -a image; do {
-            grep -E "$image" new_images.txt -q
-            [[ $(echo $?) -eq 0 ]] && echo $image >> images_to_sync.txt
-          } done << old_images.txt
-
-
-
-      - name: sync images
-        shell: bash
-        run: |
-          az account set -n ${{env.NEW_ACR_SUBSCRIPTION_ID}}
-
-          n=0;
-          while read -r -a image; do {
-            echo "Importing image $image to ${{env.NEW_ACR_NAME}}"
-            az acr import \
-               --name ${{env.NEW_ACR_NAME}} \
-               --source $repo:$tag \
-               --image $repo:$tag \
-               --registry /subscriptions/${{env.OLD_ACR_SUBSCRIPTION_ID}}/resourceGroups/${{env.OLD_ACR_RESOURCE_GROUP}}/providers/Microsoft.ContainerRegistry/registries/${{env.OLD_ACR_RESOURCE_NAME}}
-            n=$(($n + 1));
-            echo "Import done for $image"
-          } << done images_to_sync.txt
-
-          echo "Total count of imported tags: $n"
-
+      - name: import container images
+        uses: .github/actions/import_container_images
+        with:
+          source_acr_subscription_id: 1d49c337-1058-4fe0-997f-fb7263956e13
+          source_acr_resource_group: efa-bremen-oeffentliche-vergabe
+          source_acr_resource_name: efabremenoeffentlichevergabedev
+          dest_acr_subscription_id: 006eefc2-3b28-4a09-80e1-b8d6f23584d2
+          dest_acr_resource_group: efa-fhb
+          dest_acr_resource_name: efafhb
