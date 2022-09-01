@@ -11,7 +11,7 @@ env:
   OLD_ACR_RESOURCE_NAME: efabremenoeffentlichevergabedev
   NEW_ACR_SUBSCRIPTION_ID: 006eefc2-3b28-4a09-80e1-b8d6f23584d2
   NEW_ACR_RESOURCE_GROUP: efa-fhb
-  NEW_ACR_NAME: efafhb
+  NEW_ACR_RESOURCE_NAME: efafhb
 
 
 jobs:
@@ -33,13 +33,13 @@ jobs:
 
           for type in old new; do {
 
-            [[ "$type" == "new" ]] && {
+            if [[ "$type" == "new" ]]; then
               subscr_id=$(echo ${{env.NEW_ACR_SUBSCRIPTION_ID}})
               acr_name=$(echo ${{env.NEW_ACR_RESOURCE_NAME}})
-            } || {
+            else
               subscr_id=$(echo ${{env.OLD_ACR_SUBSCRIPTION_ID}})
               acr_name=$(echo ${{env.OLD_ACR_RESOURCE_NAME}})
-            }
+            fi
 
             az account set -n $subscr_id
 
