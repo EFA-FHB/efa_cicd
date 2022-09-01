@@ -4,7 +4,7 @@ name: "Sync container registries"
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "0 0 * * *"
 
 concurrency:
   group: sync_acrs
