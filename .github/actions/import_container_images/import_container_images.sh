@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 for type in old new; do {
 
@@ -24,11 +24,14 @@ for type in old new; do {
 
   } done
 
-  echo "Found $(wc -l "$type_images".txt) in registry $acr_name..."
+  echo "Found $(wc -l "$type"_images.txt) in registry $acr_name..."
   echo
 } done
 
-while read -r -a image; do {
+find . -name "*.txt" -exec cat {} \;
+
+
+while read -r image; do {
   echo "Checking image $image..."
   grep -E "$image" new_images.txt -q
   if [[ $(echo $?) -ne 0 ]]; then
