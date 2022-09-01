@@ -20,24 +20,30 @@ for type in old new; do {
     tags=$(az acr repository show-tags -n "$acr_name" --repository $repo | jq .[] | tr -d '"')
     for tag in $tags; do {
       echo "$repo:$tag" >> "$type"_images.txt
-      echo "Preparing sync for image: $(tail -1 "$type"_images.txt)"
     } done
 
   } done
 
+  echo "Found $(wc -l "$type_images".txt) in registry $acr_name..."
+  echo
 } done
 
 while read -r -a image; do {
   echo "Checking image $image..."
   grep -E "$image" new_images.txt -q
-  if [[ $(echo $?) -eq 0 ]]; then
-    echo "Import needed"
+  if [[ $(echo $?) -ne 0 ]]; then
+    echo "Import needed, adding to import list..."
     echo $image >> images_to_sync.txt
   else
     echo "Already imported, skipping..."
   fi
 
 } done << old_images.txt
+
+if [[ ! -f images_to_sync.txt ]]; then
+  echo "found no images to sync";
+  exit 0;
+fi
 
 echo "Found $(wc -l images_to_sync.txt) images to import"
 
