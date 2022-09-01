@@ -2,23 +2,34 @@ name: import_container_images
 description: "Fetches a list of container images from one container registry and imports them to another"
 
 inputs:
-  token:
-    description: "Token used for authenticating against Github Rest API"
+  source_acr_subscription_id:
+    description: "Azure Subscription Id of source container registry"
     required: true
-  repo:
-    description: "Name of repository"
+  source_acr_resource_group:
+    description: "Azure Resource group of source container registry"
     required: true
-  retain-max-days:
-    description: "Number of days to keep records of workflow runs."
-    required: false
-    default: "30"
+  source_acr_resource_name:
+    description: "Name of source container registry"
+    required: true
+  dest_acr_subscription_id:
+    description: "Azure Subscription Id of target container registry"
+    required: true
+  dest_acr_resource_group:
+    description: "Azure Resource group of target container registry"
+    required: true
+  dest_acr_resource_name:
+    description: "Name of target container registry"
+    required: true
 
 runs:
   steps:
     - name: import_container_images
       env:
-        REPOSITORY: ${{inputs.repo}}
-        TOKEN: ${{inputs.token}}
-        RETAIN_MAX_DAYS: ${{inputs.retain-max-days}}
+        SOURCE_ACR_SUBSCRIPTION_ID: ${{inputs.source_acr_subscription_id}}
+        SOURCE_ACR_RESOURCE_GROUP: ${{inputs.source_acr_subscription_id}}
+        SOURCE_ACR_RESOURCE_NAME: ${{inputs.source_acr_subscription_id}}
+        DEST_ACR_SUBSCRIPTION_ID: ${{inputs.dest_acr_subscription_id}}
+        DEST_ACR_RESOURCE_GROUP: ${{inputs.dest_acr_subscription_id}}
+        DEST_ACR_RESOURCE_NAME: ${{inputs.dest_acr_subscription_id}}
       shell: bash
       run: bash ${{github.action_path}}/import_container_images.sh
