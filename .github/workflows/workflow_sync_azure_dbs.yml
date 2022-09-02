@@ -17,9 +17,16 @@ concurrency:
 
 jobs:
 
-  sync_acr_images:
+  sync_postgres_dbs:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 3
+      matrix:
+        stage: [dev, test, preview]
+
+    name: "🛠️ sync_dbs_on_${{matrix.stage}}"
 
     steps:
 
@@ -44,9 +51,11 @@ jobs:
           AAD_SERVICE_PRINCIPAL_CLIENT_SECRET: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_SECRET }}
         run: |
           az aks get-credentials --resource-group ${{env.AZURE_RESOURCE_GROUP}} --name ${{env.AZURE_RESOURCE_NAME}}
-          kubelogin convert-login -l spn
+          kubelogin convert-kubeconfig -l spn
 
       - name: test login
         shell: bash
+        env:
+          k8s_namespace: "oeffentliche-vergabe-${{matrix.stage}}"
         run: |
-          kubectl get pods -n oeffentliche-vergabe-dev
+          kubectl get pods -n ${{env.k8s_namespace}}
