@@ -56,9 +56,11 @@ jobs:
         env:
           AAD_SERVICE_PRINCIPAL_CLIENT_ID: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_ID }}
           AAD_SERVICE_PRINCIPAL_CLIENT_SECRET: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_SECRET }}
+          KUBECONFIG: "~/.kube/config.bremen"
         run: |
           az aks get-credentials --resource-group ${{env.AZURE_RESOURCE_GROUP}} --name ${{env.AZURE_RESOURCE_NAME}}
           kubelogin convert-kubeconfig -l spn
+          kubectl config view --raw
 
       - name: test login
         shell: bash
