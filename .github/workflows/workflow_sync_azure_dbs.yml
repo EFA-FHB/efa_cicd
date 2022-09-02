@@ -60,7 +60,6 @@ jobs:
           az aks get-credentials --resource-group ${{env.AZURE_RESOURCE_GROUP}} --name ${{env.AZURE_RESOURCE_NAME}}
           kubelogin convert-kubeconfig -l spn
 
-
       - name: test login
         shell: bash
         env:
