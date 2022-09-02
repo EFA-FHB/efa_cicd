@@ -54,8 +54,11 @@ jobs:
       - name: get K8s credentials + login
         shell: bash
         run: |
-          export AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_ID }}
-          export AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_SECRET }}
+          AAD_SERVICE_PRINCIPAL_CLIENT_ID=${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_ID }}
+          AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_SECRET }}
+          echo "AAD_SERVICE_PRINCIPAL_CLIENT_ID=${AAD_SERVICE_PRINCIPAL_CLIENT_ID}" >> $GITHUB_ENV
+          echo "AAD_SERVICE_PRINCIPAL_CLIENT_SECRET=${AAD_SERVICE_PRINCIPAL_CLIENT_SECRET}" >> $GITHUB_ENV
+
           az aks get-credentials --resource-group ${{env.AZURE_RESOURCE_GROUP}} --name ${{env.AZURE_RESOURCE_NAME}}
           kubelogin convert-kubeconfig -l spn
 
@@ -64,7 +67,7 @@ jobs:
         env:
           k8s_namespace: "oeffentliche-vergabe-${{matrix.stage}}"
         run: |
-          kubectl config view --raw
+          env | grep AAD
           kubectl get pods -n ${{env.k8s_namespace}}
 
 #      - name: Start SSH via Ngrok
