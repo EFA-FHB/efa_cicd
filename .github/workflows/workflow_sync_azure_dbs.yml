@@ -1,0 +1,52 @@
+# This workflow creates a release for the application.
+#
+name: "Sync postgres databases"
+
+on:
+  workflow_dispatch:
+  #schedule:
+  # - cron: "0 0 * * *"
+
+env:
+  AZURE_SUBSCRIPTION_ID: 1d49c337-1058-4fe0-997f-fb7263956e13
+  AZURE_RESOURCE_GROUP: efa-bremen-oeffentliche-vergabe
+  AZURE_RESOURCE_NAME: efa-bremen-oeffentliche-vergabe-dev
+
+concurrency:
+  group: sync_dbs
+
+jobs:
+
+  sync_acr_images:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CREDENTIALS }}
+
+      - name: set subscription
+        shell: bash
+        run: |
+          az account set -n ${{env.AZURE_SUBSCRIPTION_ID}}
+
+      - name: get kubelogin
+        run: brew install Azure/kubelogin/kubelogin
+
+      - name: get K8s credentials + login
+        shell: bash
+        env:
+          AAD_SERVICE_PRINCIPAL_CLIENT_ID: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_ID }}
+          AAD_SERVICE_PRINCIPAL_CLIENT_SECRET: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_SECRET }}
+        run: |
+          az aks get-credentials --resource-group ${{env.AZURE_RESOURCE_GROUP}} --name ${{env.AZURE_RESOURCE_NAME}}
+          kubelogin convert-login -l spn
+
+      - name: test login
+        shell: bash
+        run: |
+          kubectl get pods -n oeffentliche-vergabe-dev
