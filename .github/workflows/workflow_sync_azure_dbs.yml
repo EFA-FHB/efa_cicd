@@ -47,7 +47,7 @@ jobs:
         run: |
           where=$(mktemp)
           cd ${where}
-          wget -P ${where} https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
+          wget -q -P ${where} https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
           unzip ${where}/kubelogin-linux-amd64.zip -d ${where}
           mv ${where}/bin/linux_amd64/kubelogin /usr/bin
           chmod +x /usr/bin/kubelogin
