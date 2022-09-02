@@ -24,7 +24,8 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        stage: [dev, test, preview]
+        #stage: [dev, test, preview]
+        stage: [dev]
 
     name: "🛠️ sync_dbs_on_${{matrix.stage}}"
 
@@ -47,6 +48,7 @@ jobs:
           where=$(mktemp)
           wget -P $where https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
           unzip ${where}/kubelogin-linux-amd64.zip
+          ls -la ${where}
           chmod +x ${where}/bin/linux_amd64/kubelogin
           mv ${where}/bin/linux_amd64/kubelogin /usr/bin
 
