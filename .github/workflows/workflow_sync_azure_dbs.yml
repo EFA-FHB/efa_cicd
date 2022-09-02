@@ -42,7 +42,13 @@ jobs:
           az account set -n ${{env.AZURE_SUBSCRIPTION_ID}}
 
       - name: get kubelogin
-        run: brew install Azure/kubelogin/kubelogin
+        shell: bash
+        run: |
+          where=$(mktemp)
+          wget -P $where https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelogin-linux-amd64.zip
+          unzip ${where}/kubelogin-linux-amd64.zip
+          chmod +x ${where}/bin/linux_amd64/kubelogin
+          mv ${where}/bin/linux_amd64/kubelogin /usr/bin
 
       - name: get K8s credentials + login
         shell: bash
