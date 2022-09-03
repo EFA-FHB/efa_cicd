@@ -62,6 +62,6 @@ jobs:
           kubelogin convert-kubeconfig -l spn
 
       - name: sync_azure_dbs
-        uses: ./.github/actions/sync_azure_dbs
+        uses: ./.github/actions/sync_azure_db
         with:
           k8s_namespace: "oeffentliche-vergabe-${{matrix.stage}}"
