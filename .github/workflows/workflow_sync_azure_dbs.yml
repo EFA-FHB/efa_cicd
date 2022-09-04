@@ -4,8 +4,9 @@ name: "Sync postgres databases"
 
 on:
   workflow_dispatch:
-  #schedule:
-  # - cron: "0 0 * * *"
+
+  schedule:
+   - cron: "0 0 * * *"
 
 env:
   AZURE_SUBSCRIPTION_ID: 1d49c337-1058-4fe0-997f-fb7263956e13
