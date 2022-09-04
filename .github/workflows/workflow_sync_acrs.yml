@@ -3,6 +3,7 @@
 name: "Sync container registries"
 
 on:
+  
   schedule:
     - cron: "0 0 * * *"
 
