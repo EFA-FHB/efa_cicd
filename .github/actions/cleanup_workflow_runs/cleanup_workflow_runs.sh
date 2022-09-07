@@ -26,7 +26,7 @@ echo "Got ${total_run_count} runs for repository ${REPOSITORY}"
 
 retain_max_run_count=${RETAIN_MAX_RUN_COUNT:-0}
 
-if [[ "${retain_max_run_count}}" -lt 30 ]]; then
+if [[ "${retain_max_run_count}" -lt 30 ]]; then
   #keep the last thirty runs
   retain_max_run_count=30
 fi
@@ -37,6 +37,7 @@ echo "Will delete ${delete_run_count} workflow runs..."
 cat all.txt | jq --arg cnt $delete_run_count '.[0:($cnt|tonumber)]' | jq '.[] | .url' | tr -d '"' | sort > url_for_delete.txt
 
 while read url; do {
+  echo "delete ${url}"
   curl -X DELETE "${args[@]}" "$url"
   count=$((count-1))
 } done < url_for_delete.txt
