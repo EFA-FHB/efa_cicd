@@ -44,3 +44,4 @@ while read url; do {
 
 echo "Done!"
 echo "Deleted $(cat url_for_delete.txt | wc -l)"
+exit 0;
