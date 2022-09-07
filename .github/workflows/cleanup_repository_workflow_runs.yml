@@ -1,0 +1,38 @@
+# This workflow creates a release for the application.
+#
+name: "cleanup repository workflow runs"
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 0 * * *"
+
+concurrency:
+  group: cleanup_repository_workflow_runs
+
+jobs:
+
+  cleanup:
+    runs-on: ubuntu-latest
+    strategy:
+      continue-on-error: true
+      matrix:
+        repo:
+          - bkms-mediator
+          - vergabesystem-adapter
+          - k8s_workflows
+          - bkms-mock-server
+          - ai-vergabeplattform-mock
+          - efa_cicd
+
+    name: "clean ${{matrix.repo}}"
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: cleanup_workflow_runs
+        uses: ./.github/actions/cleanup_workflow_runs
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          repo: "EFA-FHB/${{matrix.repo}}"

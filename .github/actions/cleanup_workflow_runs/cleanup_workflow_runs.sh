@@ -1,9 +1,11 @@
-#!/bin/bash -e
+#!/bin/bash -x
 
 args=(-sS -H "Accept: application/vnd.github+json" -H "Authorization: token ${TOKEN}")
 
 page=1
 workflow_runs="-1"
+
+rm *.txt *.tmp 2> /dev/null
 
 while [ true ]; do
   curl "${args[@]}" "https://api.github.com/repos/${REPOSITORY}/actions/runs?page=$page&per_page=100" > workflow_runs.tmp
@@ -19,14 +21,21 @@ while [ true ]; do
   fi
 done
 
-RETAIN_MAX_DAYS=${RETAIN_MAX_DAYS:-30}
-days_ago=$(($(date +%s) - $((86400*$RETAIN_MAX_DAYS))))
+total_run_count=$(cat all.txt | jq '. | length')
+echo "Got ${total_run_count} runs for repository ${REPOSITORY}"
 
-jq < all.txt ".[] | select (.created_at | fromdateiso8601 < $days_ago).url" | tr -d '"' > url_for_delete.txt
+retain_max_run_count=${RETAIN_MAX_RUN_COUNT:-0}
 
-count=$(cat url_for_delete.txt | wc -l)
-echo -e "\n\nstart deleting $count urls\n\n"
-#
+if [[ "${retain_max_run_count}}" -lt 30 ]]; then
+  #keep the last thirty runs
+  retain_max_run_count=30
+fi
+
+delete_run_count=$(($total_run_count - $retain_max_run_count))
+echo "Will delete ${delete_run_count} workflow runs..."
+
+cat all.txt | jq --arg cnt $delete_run_count '.[0:($cnt|tonumber)]' | jq '.[] | .url' | tr -d '"' | sort > url_for_delete.txt
+
 while read url; do {
   curl -X DELETE "${args[@]}" "$url"
   count=$((count-1))
