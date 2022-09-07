@@ -15,8 +15,8 @@ jobs:
 
   cleanup:
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
-      continue-on-error: true
       matrix:
         repo:
           - bkms-mediator
