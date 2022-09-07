@@ -5,7 +5,7 @@ args=(-sS -H "Accept: application/vnd.github+json" -H "Authorization: token ${TO
 page=1
 workflow_runs="-1"
 
-rm *.txt *.tmp 2> /dev/null
+total_run_count=0
 
 while [ true ]; do
   curl "${args[@]}" "https://api.github.com/repos/${REPOSITORY}/actions/runs?page=$page&per_page=100" > workflow_runs.tmp
@@ -15,13 +15,13 @@ while [ true ]; do
   [[ ! -f all.txt ]] && touch all.txt
   jq -n '[inputs]  | add' all.txt list.tmp > all.tmp
   mv all.tmp all.txt
-  echo "items saved: $(cat all.txt | wc -l)"
+  total_run_count=$(cat all.txt | jq '. | length')
+  echo "runs collected so far: $total_run_count"
   if [[ "${workflow_runs}" -eq 0 ]]; then
     break;
   fi
 done
 
-total_run_count=$(cat all.txt | jq '. | length')
 echo "Got ${total_run_count} runs for repository ${REPOSITORY}"
 
 retain_max_run_count=${RETAIN_MAX_RUN_COUNT:-0}
@@ -34,7 +34,7 @@ fi
 delete_run_count=$(($total_run_count - $retain_max_run_count))
 echo "Will delete ${delete_run_count} workflow runs..."
 
-cat all.txt | jq --arg cnt $delete_run_count '.[0:($cnt|tonumber)]' | jq '.[] | .url' | tr -d '"' | sort > url_for_delete.txt
+cat all.txt | jq '.[] | .url' | tr -d '"' | tail -n ${delete_run_count} | sort > url_for_delete.txt
 
 while read url; do {
   echo "delete ${url}"
