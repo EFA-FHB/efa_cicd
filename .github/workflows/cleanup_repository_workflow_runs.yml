@@ -5,8 +5,8 @@ name: "cleanup repository workflow runs"
 on:
   workflow_dispatch:
 
-  schedule:
-    - cron: "0 0 * * *"
+  #schedule:
+  #  - cron: "0 0 * * *"
 
 concurrency:
   group: cleanup_repository_workflow_runs
