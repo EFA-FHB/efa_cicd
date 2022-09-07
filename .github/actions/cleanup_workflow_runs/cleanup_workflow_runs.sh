@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 args=(-sS -H "Accept: application/vnd.github+json" -H "Authorization: token ${TOKEN}")
 
