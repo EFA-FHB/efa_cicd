@@ -1,4 +1,4 @@
-name: delete_old_workflow_runs
+name: cleanup_workflow_runs
 description: "Deletes old workflow run"
 
 inputs:
@@ -8,8 +8,8 @@ inputs:
   repo:
     description: "Name of repository"
     required: true
-  retain-max-days:
-    description: "Number of days to keep records of workflow runs."
+  retain-max-run-count:
+    description: "Number of runs to keep."
     required: false
     default: "30"
 
@@ -20,6 +20,6 @@ runs:
       env:
         REPOSITORY: ${{inputs.repo}}
         TOKEN: ${{inputs.token}}
-        RETAIN_MAX_DAYS: ${{inputs.retain-max-days}}
+        RETAIN_MAX_RUN_COUNT: ${{inputs.retain-max-run-count}}
       shell: bash
-      run: bash ${{github.action_path}}/delete_workflow_runs.sh
+      run: bash ${{github.action_path}}/cleanup_workflow_runs.sh
