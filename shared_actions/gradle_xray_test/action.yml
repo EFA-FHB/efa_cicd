@@ -106,7 +106,7 @@ runs:
         xrayCloud: "false"
         xrayBaseUrl: "https://jira.nortal.com"
         testFormat: "junit"
-        testPaths: "**/reports/*.xml"
+        testPaths: "**/target/*.xml"
         testEnvironments: GitHub
         testPlanKey: ${{ inputs.xray-testplan-key }} #see https://jira.nortal.com/browse/D602904-101#view-issue-testplan-testexecs-section_heading
         projectKey: ${{ inputs.xray-project-key }}
