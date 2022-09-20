@@ -1,6 +1,7 @@
 ## docker_push_image
 
-This action pushes a given image to a registry.
+This action pushes a given image to a registry. Additionally, it re-tags given image version as latest and 
+pushes that one too.
 
 ## Inputs
 

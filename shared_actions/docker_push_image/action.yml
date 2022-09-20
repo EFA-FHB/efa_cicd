@@ -27,11 +27,16 @@ runs:
         origImage=${{ inputs.imageid }}
         image_name=$(echo $origImage | cut -d":" -f1)
         tag=$(echo $origImage | cut -d":" -f2)
+        
+        latestImage="${image_name}:latest"
+        docker tag $origImage $latestImage
 
         docker push $origImage
+        docker push $latestImage
 
         echo "::set-output name=tag::$tag"
         echo "$tag" > ${{env.tag-file-name}}
+        echo "$latestImage" >> ${{env.tag-file-name}}
         echo "::set-output name=tag_file_name::${{env.tag-file-name}}"
 
     - uses: actions/upload-artifact@v2
