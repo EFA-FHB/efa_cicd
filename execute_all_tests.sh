@@ -5,6 +5,14 @@ GREEN="\033[0;32m"
 YELLOW="\033[0;33m"
 NC="\033[0m"
 
+# This script searchs files named 'test.sh' in directory 'shared_actions'.
+# It invokes each test file and updates the count for "total_passed" and
+# "total_failed" based on its execution result.
+#
+# Each test _MUST_ echo the following string "passed=<number>;failed=<number>".
+#
+#
+
 main() {
 
   local files=()
