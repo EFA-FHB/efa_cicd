@@ -1,0 +1,38 @@
+name: create_image_tag_names
+description: "Create image tags based on branch name input"
+
+inputs:
+  branchName:
+    description: "Name of branch"
+    required: true
+  buildNumber:
+    description: "Number of the build run"
+    required: true
+  semver:
+    description: "String in semantic versioning format"
+    required: true
+  debug:
+    description: "Whether to debug the script"
+    required: false
+
+outputs:
+  tags:
+    description: "Comma delimited list of image tags"
+    value: ${{steps.create_image_tags.outputs.tags}}
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: create image tags
+      id: create_image_tags
+      shell: bash
+      env:
+        BRANCH_NAME: ${{inputs.branchName}}
+        SEMVER: ${{inputs.branchName}}
+        BUILD_NUMBER: ${{inputs.buildNumber}}
+        DEBUG: ${{inputs.debug}}
+      run: |
+        local tags=
+        tags=$(./create_image_tags.sh)
+        echo "tags=${tags}" >> $GITHUB_OUTPUT

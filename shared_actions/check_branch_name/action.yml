@@ -1,0 +1,29 @@
+name: check_branch_name
+description: "Checks a branch name for validity"
+
+inputs:
+  branchName:
+    description: "Name of branch"
+    required: true
+  debug:
+    description: "Whether to debug the script"
+    required: false
+outputs:
+  valid:
+    description: "Whether the branch name is valid according to branch naming convention"
+    value: ${{steps.check_branch.outputs.valid}}
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: check branch
+      id: check_branch
+      shell: bash
+      env:
+        BRANCH_NAME: ${{inputs.branchName}}
+        DEBUG: ${{inputs.debug}}
+      run: |
+        local valid=
+        valid=$(./check_branch_name.sh)
+        echo "valid=${valid}" >> $GITHUB_OUTPUT
