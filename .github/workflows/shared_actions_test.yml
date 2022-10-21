@@ -1,0 +1,32 @@
+# This workflow executes all tests of shared actions.
+#
+name: "🏗️ CI"
+
+on:
+  push:
+    branches:
+      - "main"
+    tags:
+      - '*'
+  pull_request:
+    types: [opened,reopened,synchronize]
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout project
+        with:
+          fetch-depth: 0 #spotless fix
+
+      - name: run tests
+        shell: bash
+        run: ./execute_all_tests.sh
+
