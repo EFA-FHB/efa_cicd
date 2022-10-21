@@ -20,6 +20,9 @@ This repository currently contains the following shared actions:
 - [create_release](shared_actions/create_release/README.md)
 - [docker_push_image](shared_actions/docker_push_image/README.md)
 - [trigger_deploy_workflow](shared_actions/trigger_deploy_workflow/README.md)
+- [check_branch_name](shared_actions/check_branch_name/README.md)
+- [create_image_tags](shared_actions/create_image_tags/README.md)
+
 
 ## Installation
 
