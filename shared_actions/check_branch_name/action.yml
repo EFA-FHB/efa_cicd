@@ -11,7 +11,7 @@ inputs:
 outputs:
   valid:
     description: "Whether the branch name is valid according to branch naming convention"
-    value: ${{steps.check_branch.outputs.is_valid}}
+    value: ${{steps.check_branch.outputs.valid}}
 runs:
   using: "composite"
 
@@ -24,5 +24,6 @@ runs:
         BRANCH_NAME: ${{inputs.branchName}}
         DEBUG: ${{inputs.debug}}
       run: |
-        local is_valid=$(echo ./check_branch_name.sh)
-        echo "is_valid=${is_valid}" >> $GITHUB_OUTPUT
+        local valid=
+        valid=$(./check_branch_name.sh)
+        echo "valid=${valid}" >> $GITHUB_OUTPUT

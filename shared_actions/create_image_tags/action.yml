@@ -18,7 +18,7 @@ inputs:
 outputs:
   tags:
     description: "Comma delimited list of image tags"
-    value: ${{steps.create_image_tag_names.outputs.tags}}
+    value: ${{steps.create_image_tags.outputs.tags}}
 runs:
   using: "composite"
 
@@ -33,5 +33,6 @@ runs:
         BUILD_NUMBER: ${{inputs.buildNumber}}
         DEBUG: ${{inputs.debug}}
       run: |
-        local tags=$(echo ./create_image_tags.sh)
+        local tags=
+        tags=$(./create_image_tags.sh)
         echo "tags=${tags}" >> $GITHUB_OUTPUT
