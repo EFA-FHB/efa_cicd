@@ -78,7 +78,7 @@ runs:
           ${{steps.meta.outputs.json}}
         EOF
 
-        jq < meta.json ".labels" | tr -d '{}' | grep -v "^$" | sed 's/:/=/' | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" | tr -d "," > labels
+        jq < meta.json ".labels" | tr -d '{}' | grep -v "^$" | sed 's/":\ "/=/' | tr -d "," > labels
 
         cmd="docker build"
 
