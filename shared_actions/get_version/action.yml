@@ -34,13 +34,15 @@ runs:
     - name: "handle gradle.properties"
       id: gradle_properties
       if: ${{inputs.versionFileName == 'gradle.properties' }}
-      uses: madhead/read-java-properties@latest
-      with:
-        file: ${{inputs.versionFileName}}
-        property: version
-        default: "<none>"
+      shell: bash
+      run: |
+        version=$(grep -E "version" "${{github.workspace}}/gradle.properties" | cut -d "=" -f2)
+        echo "version=${version}" >> $GITHUB_OUTPUT
 
     - name: "handle package.json"
       id: package_json
       if: ${{inputs.versionFileName == 'package.json' }}
-      uses: martinbeentjes/npm-get-version-action@main
+      shell: bash
+      run: |
+        version=$(jq < "${{github.workspace}}/package.json" .version | tr -d '"')
+        echo "version=${version}" >> $GITHUB_OUTPUT
