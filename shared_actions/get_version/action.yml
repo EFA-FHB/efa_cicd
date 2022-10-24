@@ -23,7 +23,9 @@ runs:
       run: |
         VERSION_FILE_NAME=$(echo "${{env.VERSION_FILE_NAME}}")
         for file in gradle.properties package.json; do {
-          if [[ "${VERSION_FILE_NAME}" ]]; then exit 0 fi
+          if [[ "${VERSION_FILE_NAME}" ]]; then
+            exit 0
+          fi
         } done
 
         echo "${VERSION_FILE_NAME} is invalid. Must be one of [ ${supported_files} ]"
