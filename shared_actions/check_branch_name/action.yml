@@ -24,7 +24,7 @@ runs:
         BRANCH_NAME: ${{inputs.branchName}}
         DEBUG: ${{inputs.debug}}
       run: |
-        name=$(echo "${{github.action_path}}" | xargs -I% basename %)
+        basename=$(echo "${{github.action_path}}" | xargs -I% basename %)
         file=$(find "${{github.workspace}}" -type f -name "$basename*" | head -1)
         if [[ -z "${file}" ]]; then
           echo "found no file to execute"
