@@ -78,7 +78,7 @@ runs:
         echo "image=${image}" >> $GITHUB_OUTPUT
 
         cat meta.json | jq ".labels" \
-                  | tr -d '{} ' \
+                  | tr -d '{}' \
                   | grep -v "^$" \
                   | sed 's/:/=/' \
                   | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
