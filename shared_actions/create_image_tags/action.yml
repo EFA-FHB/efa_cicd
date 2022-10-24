@@ -33,6 +33,5 @@ runs:
         BUILD_NUMBER: ${{inputs.buildNumber}}
         DEBUG: ${{inputs.debug}}
       run: |
-        local tags=
         tags=$(./create_image_tags.sh)
         echo "tags=${tags}" >> $GITHUB_OUTPUT
