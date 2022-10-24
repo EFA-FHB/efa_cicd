@@ -64,33 +64,25 @@ runs:
         tags: |
           type=raw,value=${{env.tag}}
 
-    - name: Docker labels
-      id: docker_labels
-      shell: bash
-      run: |
-        cat <<EOF > meta.json
-          ${{steps.meta.outputs.json}}
-        EOF
-        labels=$(jq < meta.json ".labels" | tr -d '{}' | grep -v "^$" | sed 's/:/=/' | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" | tr -d ",")
-        echo "labels=${labels}" >> $GITHUB_OUTPUT
-
     - name: Build Docker Image
       id: build_image
       shell: bash
       env:
         image: ${{inputs.image}}
         tags: ${{inputs.imageTags}}
-        labels: ${{steps.docker_labels.outputs.labels}}
       run: |
         image="${{env.image}}"
         echo "image=${image}" >> $GITHUB_OUTPUT
 
-        cmd="docker build"
-        for label in ${{env.labels}}; do {
-          cmd="${cmd} --label $label";
-        } done
+        cat <<EOF > meta.json
+          ${{steps.meta.outputs.json}}
+        EOF
 
-        #while read label; do { cmd="${cmd} --label $label";  } done < labels
+        jq < meta.json ".labels" | tr -d '{}' | grep -v "^$" | sed 's/:/=/' | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" | tr -d "," > labels
+
+        cmd="docker build"
+
+        while read label; do { cmd="${cmd} --label $label";  } done < labels
 
         cmd="$cmd --label org.label-schema.vcs-ref="${{github.sha}}""
 
