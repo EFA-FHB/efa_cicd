@@ -105,7 +105,7 @@ runs:
       env:
         tags: ${{inputs.imageTags}}
         origImage: ${{ steps.build_image.outputs.docker_image }}
-      bash: shell
+      shell: bash
       run: |
         origImage="${{ env.origImage }}"
         repo=$(echo ${origImage} | cut -d":" -f1)
