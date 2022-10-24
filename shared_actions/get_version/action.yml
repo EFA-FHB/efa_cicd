@@ -21,7 +21,7 @@ runs:
         VERSION_FILE_NAME: ${{inputs.versionFileName}}
         DEBUG: ${{inputs.debug}}
       run: |
-        VERSION_FILE_NAME=$(echo "${VERSION_FILE_NAME}" | tr -d '[:blank:]')
+        VERSION_FILE_NAME=$(echo "${{env.VERSION_FILE_NAME}}" | tr -d '[:blank:]')
 
         supported_files="gradle.properties package.json"
         supported_files_regex=($echo "^(${supported_files/ /|})$")
