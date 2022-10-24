@@ -24,6 +24,11 @@ runs:
         BRANCH_NAME: ${{inputs.branchName}}
         DEBUG: ${{inputs.debug}}
       run: |
-        path=${{github.action_path}}
-        valid=$(./$path/check_branch_name.sh)
-        echo "valid=${valid}" >> $GITHUB_OUTPUT
+        name=$(echo "${{github.action_path}}" | xargs -I% basename %)
+        file=$(find "${{github.workspace}}" -type f -name "$basename*" | head -1)
+        if [[ -z "${file}" ]]; then
+          echo "found no file to execute"
+          exit 1
+        fi
+
+        echo "valid=$(bash $file)" >> $GITHUB_OUTPUT
