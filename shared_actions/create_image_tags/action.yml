@@ -29,7 +29,7 @@ runs:
       shell: bash
       env:
         BRANCH_NAME: ${{inputs.branchName}}
-        SEMVER: ${{inputs.branchName}}
+        SEMVER: ${{inputs.semver}}
         BUILD_NUMBER: ${{inputs.buildNumber}}
         DEBUG: ${{inputs.debug}}
       run: |
