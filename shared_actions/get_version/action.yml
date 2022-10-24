@@ -21,15 +21,13 @@ runs:
         VERSION_FILE_NAME: ${{inputs.versionFileName}}
         DEBUG: ${{inputs.debug}}
       run: |
-        VERSION_FILE_NAME=$(echo "${{env.VERSION_FILE_NAME}}" | tr -d '[:blank:]')
+        VERSION_FILE_NAME=$(echo "${{env.VERSION_FILE_NAME}}")
+        for file in gradle.properties package.json; do {
+          if [[ "${VERSION_FILE_NAME}" ]]; then exit 0 fi
+        } done
 
-        supported_files="gradle.properties package.json"
-        supported_files_regex=($echo "^(${supported_files/ /|})$")
-
-        if [[ "${VERSION_FILE_NAME}" =~ $supported_files_regex ]]; then
-          echo "Value of attribute 'versionFileName' must be one of [ ${supported_files} ]"
-          exit 1;
-        fi
+        echo "${VERSION_FILE_NAME} is invalid. Must be one of [ ${supported_files} ]"
+        exit 1;
 
     - name: "handle gradle.properties"
       id: gradle_properties
