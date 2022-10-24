@@ -5,6 +5,9 @@ inputs:
   image:
     description: "Value to use as name of docker container image"
     required: true
+  imageTags:
+    description: "Tags used for tagging the image"
+    required: true
   context:
     description: "Path to use as docker build context"
     required: false
@@ -19,6 +22,9 @@ inputs:
     default: "true"
 
 outputs:
+  images:
+    description: "Name of tagged docker images"
+    value: "${{ steps.tag_images.outputs.images }}"
   docker_image:
     description: "Name of created container image"
     value: "${{ steps.build_image.outputs.docker_image }}"
@@ -36,50 +42,23 @@ runs:
       run: |
         echo "::set-output name=date::$(date --rfc-3339=seconds)"
 
-    - name: current version
-      id: version
-      shell: bash
-      run: |
-
-        for file in package.json gradle.properties; do {
-          version=$(find . -maxdepth 1 -name $file -exec sh -c 'grep -E "version" {}' \;)
-          if [[ "$file" == "package.json" ]]; then
-            version=$(echo $version | sed -E 's/"version":\s*"(.+)".*/\1/')
-          else
-            version=$(echo $version | sed -E 's/version=(.+)/\1/')
-          fi
-
-          if [[ -n $version ]]; then
-            break;
-          fi
-        } done
-
-        echo "::set-output name=version::$version"
-
-    - name: Docker tag
-      id: tag
-      shell: bash
+    - name: get primary tag
+      id: tag_image
       env:
-        branch: ${{github.head_ref || github.ref_name}}
-        version: ${{steps.version.outputs.version}}
+        tags: ${{inputs.imageTags}}
+      shell: bash
       run: |
-        version=$(echo ${{env.version}} | sed 's/-SNAPSHOT//')
-        if [[ $(printenv GITHUB_REF) =~ main|release/.+|tags/.+ ]]; then
-          [[ "${{env.version}}" =~ SNAPSHOT ]] && tag="${version}-beta" || tag="${version}"
-        else
-          branch=$(echo "${{env.branch}}" | sed -E "s/[^a-z0-9\.-]/ /g" | sed -E "s/\s+/-/g")
-          tag="${version}-${branch}"
-        fi
+        IFS="," read -r -a parts <<<"${{env.imageTags}}"
+        echo "tag=${parts[0]}" >> $GITHUB_OUTPUT
 
-        tag="${tag}-${{ github.run_number }}"
-
-        echo "::set-output name=tag::${tag}"
+        #added backwards compatibility
+        echo "tags=${{env.imageTags}}" >> $GITHUB_OUTPUT
 
     - name: Docker meta
       uses: docker/metadata-action@v4
       id: meta
       env:
-        tag: ${{steps.tag.outputs.tag}}
+        tag: ${{steps.get_primary_tag.outputs.tag}}
       with:
         images: ${{inputs.image}}
         tags: |
@@ -88,13 +67,17 @@ runs:
     - name: Build Docker Image
       id: build_image
       shell: bash
+      env:
+        tags: ${{inputs.imageTags}}
       run: |
         cat <<EOF > meta.json
           ${{steps.meta.outputs.json}}
         EOF
 
         image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
-        echo "::set-output name=image::${image}"
+
+        echo "image=${image}" >> $GITHUB_OUTPUT
+
         cat meta.json | jq ".labels" \
                   | tr -d '{} ' \
                   | grep -v "^$" \
@@ -115,7 +98,29 @@ runs:
         echo "$cmd"
         $cmd
 
-        echo "::set-output name=docker_image::${image}"
+        echo "docker_image=${image}" >> $GITHUB_OUTPUT
+
+    - name: tag images
+      id: tag_images
+      env:
+        tags: ${{inputs.imageTags}}
+        origImage: ${{ steps.build_image.outputs.docker_image }}
+      bash: shell
+      run: |
+        origImage="${{ env.origImage }}"
+        repo=$(echo ${origImage} | cut -d":" -f1)
+        IFS="," read -r -a imageTags <<<"${{env.imageTags}}"
+        images=()
+
+        for tag in ${imageTags[*]}; do {
+          newImage="${repo}:${tag}"
+          docker tag $origImage $newImage
+          images+=("${newImage}")
+        } done
+
+        echo "images=${images[*]}" >> $GITHUB_OUTPUT
+
+
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}

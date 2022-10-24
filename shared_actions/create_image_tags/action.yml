@@ -33,6 +33,11 @@ runs:
         BUILD_NUMBER: ${{inputs.buildNumber}}
         DEBUG: ${{inputs.debug}}
       run: |
-        local tags=
-        tags=$(./create_image_tags.sh)
-        echo "tags=${tags}" >> $GITHUB_OUTPUT
+        basename=$(echo "${{github.action_path}}" | xargs -I% basename %)
+        file=$(find "${{github.workspace}}" -type f -name "$basename*" | head -1)
+        if [[ -z "${file}" ]]; then
+          echo "found no file to execute"
+          exit 1
+        fi
+
+        echo "tags=$(bash $file)" >> $GITHUB_OUTPUT

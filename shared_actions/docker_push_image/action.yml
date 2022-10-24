@@ -2,44 +2,23 @@ name: docker_push_image
 description: "Pushes a container image with Docker"
 
 inputs:
-  imageid:
-    description: "Reference of the docker image to push"
+  images:
+    description: "Docker images to push"
     required: true
-  tag-file-name:
-    description: "name of tag file"
-    required: false
-outputs:
-  tag:
-    description: "Tag of the pushed docker image"
-    value: "${{ steps.push_image.outputs.tag }}"
-  
-
 runs:
   using: "composite"
 
   steps:
-    - name: Push image
-      id: push_image
+
+    - name: Push images
+      id: push_images
       shell: bash
       env:
-        tag-file-name: ${{inputs.tag-file-name && inputs.tag-file-name || 'pushed_tags.txt' }}
+        images: ${{ inputs.images }}
       run: |
-        origImage=${{ inputs.imageid }}
-        image_name=$(echo $origImage | cut -d":" -f1)
-        tag=$(echo $origImage | cut -d":" -f2)
-        
-        latestImage="${image_name}:latest"
-        docker tag $origImage $latestImage
+        echo '### Pushed Docker Images' >> $GITHUB_STEP_SUMMARY
 
-        docker push $origImage
-        docker push $latestImage
-
-        echo "::set-output name=tag::$tag"
-        echo "$tag" > ${{env.tag-file-name}}
-        echo "latest" >> ${{env.tag-file-name}}
-        echo "::set-output name=tag_file_name::${{env.tag-file-name}}"
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: "${{ steps.push_image.outputs.tag }}"
-        path: ${{ steps.push_image.outputs.tag_file_name }}
+        for image in ${{ env.images }}; do {
+          docker push $image
+          echo '- $image' >> $GITHUB_STEP_SUMMARY
+        } done

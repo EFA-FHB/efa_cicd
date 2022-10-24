@@ -1,0 +1,46 @@
+name: get_version
+description: "Retrieves the current version from the specified version file"
+
+inputs:
+  versionFileName:
+    description: "Name of file which contains version information."
+    required: true
+outputs:
+  version:
+    description: "Retrieved version information"
+    value: ${{ steps.gradle_properties.outputs.value || steps.package_json.outputs.current-version }}
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: check version file name
+      id: check_version_file_name
+      shell: bash
+      env:
+        VERSION_FILE_NAME: ${{inputs.versionFileName}}
+        DEBUG: ${{inputs.debug}}
+      run: |
+        VERSION_FILE_NAME=$(echo "${VERSION_FILE_NAME}" | tr -d '[:blank:]')
+
+        supported_files="gradle.properties package.json"
+        supported_files_regex=($echo "^(${supported_files/ /|})$")
+
+        if [[ "${VERSION_FILE_NAME}" =~ $supported_files_regex ]]; then
+          echo "Value of attribute 'versionFileName' must be one of [ ${supported_files} ]"
+          exit 1;
+        fi
+
+    - name: "handle gradle.properties"
+      id: gradle_properties
+      if: ${{inputs.versionFileName == 'gradle.properties' }}
+      uses: madhead/read-java-properties@latest
+      with:
+        file: ${{inputs.versionFileName}}
+        property: version
+        default: "<none>"
+
+    - name: "handle package.json"
+      id: package_json
+      if: ${{inputs.versionFileName == 'package.json' }}
+      uses: martinbeentjes/npm-get-version-action@main
