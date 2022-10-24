@@ -26,6 +26,7 @@ runs:
       run: |
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         basename=$(echo "${{github.action_path}}" | xargs -I% basename %)
         file=$(find "${{github.workspace}}" -type f -name "$basename*" | head -1)
         if [[ -z "${file}" ]]; then
@@ -56,6 +57,8 @@ runs:
 =======
         echo ${{github}}
 >>>>>>> parent of 256cd9e... debug #3
+=======
+>>>>>>> parent of 20386a0... debug #2
         valid=$(./check_branch_name.sh)
         echo "valid=${valid}" >> $GITHUB_OUTPUT
 >>>>>>> parent of 4b82917... debug #6
