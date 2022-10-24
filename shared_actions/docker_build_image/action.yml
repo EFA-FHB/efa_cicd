@@ -68,20 +68,24 @@ runs:
       id: build_image
       shell: bash
       env:
-        image: ${{inputs.image}}
         tags: ${{inputs.imageTags}}
       run: |
-        image="${{env.image}}"
-        echo "image=${image}" >> $GITHUB_OUTPUT
-
         cat <<EOF > meta.json
           ${{steps.meta.outputs.json}}
         EOF
 
-        jq < meta.json ".labels" | tr -d '{}' | grep -v "^$" | sed 's/":\ "/=/' | tr -d "," > labels
+        image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
+        echo "image=${image}" >> $GITHUB_OUTPUT
+
+        cat meta.json | jq ".labels" \
+                  | tr -d '{} ' \
+                  | grep -v "^$" \
+                  | sed 's/:/=/' \
+                  | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
+                  | tr -d "," > labels
+
 
         cmd="docker build"
-
         while read label; do { cmd="${cmd} --label $label";  } done < labels
 
         cmd="$cmd --label org.label-schema.vcs-ref="${{github.sha}}""
