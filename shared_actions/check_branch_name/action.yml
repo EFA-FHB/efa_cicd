@@ -24,5 +24,7 @@ runs:
         BRANCH_NAME: ${{inputs.branchName}}
         DEBUG: ${{inputs.debug}}
       run: |
+        ls -la
+        echo ${{github}}
         valid=$(./check_branch_name.sh)
         echo "valid=${valid}" >> $GITHUB_OUTPUT
