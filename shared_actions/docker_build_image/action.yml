@@ -58,36 +58,39 @@ runs:
       uses: docker/metadata-action@v4
       id: meta
       env:
-        tag: ${{steps.get_primary_tag.outputs.tag}}
+        tag: ${{steps.tag_image.outputs.tag}}
       with:
         images: ${{inputs.image}}
         tags: |
           type=raw,value=${{env.tag}}
 
-    - name: Build Docker Image
-      id: build_image
+    - name: Docker labels
+      id: docker_labels
       shell: bash
-      env:
-        tags: ${{inputs.imageTags}}
       run: |
         cat <<EOF > meta.json
           ${{steps.meta.outputs.json}}
         EOF
+        labels=$(jq < meta.json ".labels" | tr -d '{}' | grep -v "^$" | sed 's/:/=/' | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" | tr -d ",")
+        echo "labels=${labels}" >> $GITHUB_OUTPUT
 
-        image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
-
+    - name: Build Docker Image
+      id: build_image
+      shell: bash
+      env:
+        image: ${{inputs.image}}
+        tags: ${{inputs.imageTags}}
+        labels: ${{steps.docker_labels.outputs.labels}}
+      run: |
+        image="${{env.image}}"
         echo "image=${image}" >> $GITHUB_OUTPUT
 
-        cat meta.json | jq ".labels" \
-                  | tr -d '{} ' \
-                  | grep -v "^$" \
-                  | sed 's/:/=/' \
-                  | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
-                  | tr -d "," > labels
-
-
         cmd="docker build"
-        while read label; do { cmd="${cmd} --label $label";  } done < labels
+        for label in ${{env.labels}}; do {
+          cmd="${cmd} --label $label";
+        } done
+
+        #while read label; do { cmd="${cmd} --label $label";  } done < labels
 
         cmd="$cmd --label org.label-schema.vcs-ref="${{github.sha}}""
 
