@@ -43,6 +43,7 @@ runs:
         ls -la
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         echo '${{ toJSON(github) }}'
         #valid=$(./check_branch_name.sh)
         #echo "valid=${valid}" >> $GITHUB_OUTPUT
@@ -52,6 +53,9 @@ runs:
 =======
         echo ${{ fromJSON(github) }}
 >>>>>>> parent of e3d3862... debug #4
+=======
+        echo ${{github}}
+>>>>>>> parent of 256cd9e... debug #3
         valid=$(./check_branch_name.sh)
         echo "valid=${valid}" >> $GITHUB_OUTPUT
 >>>>>>> parent of 4b82917... debug #6
