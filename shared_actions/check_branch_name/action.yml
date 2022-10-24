@@ -25,6 +25,7 @@ runs:
         DEBUG: ${{inputs.debug}}
       run: |
 <<<<<<< HEAD
+<<<<<<< HEAD
         basename=$(echo "${{github.action_path}}" | xargs -I% basename %)
         file=$(find "${{github.workspace}}" -type f -name "$basename*" | head -1)
         if [[ -z "${file}" ]]; then
@@ -38,3 +39,9 @@ runs:
         valid=$(./$path/check_branch_name.sh)
         echo "valid=${valid}" >> $GITHUB_OUTPUT
 >>>>>>> parent of 42fcc27... debug #8
+=======
+        ls -la
+        echo '${{ toJSON(github) }}'
+        #valid=$(./check_branch_name.sh)
+        #echo "valid=${valid}" >> $GITHUB_OUTPUT
+>>>>>>> parent of 15dbb74... debug #7
