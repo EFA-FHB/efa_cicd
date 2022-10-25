@@ -48,20 +48,13 @@ runs:
         #added backwards compatibility
         echo "tags=${parts[*]}" >> $GITHUB_OUTPUT
 
-
-        tags=()
-        for tag in ${parts[*]}; do {
-          tags+=("type=raw,value=${tag}")
-        } done
-
-        echo "tags=${tags[@]}" >> $GITHUB_OUTPUT
-
-
     - name: Docker meta
       uses: docker/metadata-action@v4
       with:
         images: ${{inputs.image}}
-        tags: ${{steps.tag_image.outputs.tags }}
+        tags: |
+          type=raw,value=${{steps.tag_image.outputs.tag}}
+    
 
     - name: Build and push
       uses: docker/build-push-action@v3
