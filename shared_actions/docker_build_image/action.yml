@@ -51,7 +51,7 @@ runs:
 
         metadata-action-tags=()
         for tag in ${parts[*]}; do {
-          metadata-actions-tags+("type=raw,value=${tag}")
+          metadata-actions-tags+=("type=raw,value=${tag}")
         } done
 
         echo "tags=${metadata-actions-tags[@]}" >> $GITHUB_OUTPUT
