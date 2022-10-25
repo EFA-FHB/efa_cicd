@@ -78,7 +78,7 @@ runs:
         origImage=$(cat meta.json | jq ".tags[0]" | tr -d '"')
         images=("${origImage}")
 
-        origTag=$(echo "${image}" | cut -d ":" -f2)
+        origTag=$(echo "${origImage}" | cut -d ":" -f2)
 
         IFS="," read -r -a additionalTags <<<"${{inputs.imageTags}}"
 
