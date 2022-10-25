@@ -98,7 +98,7 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
-        git commit -S -m "[github] update version to ${{ env.newVersion }}" -- ${{github.workspace}}/gradle.properties &> /dev/null
+        git commit -S -m "[github] update ${release_type} version to ${{ env.newVersion }}" -- ${{github.workspace}}/gradle.properties &> /dev/null
         git tag -sam "[github] create new tag ${{ env.newTag }}" ${{ env.newTag }}
 
     - name: git push
@@ -140,7 +140,7 @@ runs:
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
 
-        git commit -S -m "[github] update version to ${{ env.snapshotVersion }}" -- "${{github.workspace}}/gradle.properties" &> /dev/null
+        git commit -S -m "[github] update version to ${{ env.snapshotVersion }}" -- ${{github.workspace}}/gradle.properties &> /dev/null
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
