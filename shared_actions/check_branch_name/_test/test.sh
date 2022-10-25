@@ -59,7 +59,7 @@ main() {
   test "expected_result=true" "BRANCH_NAME=development"
   test "expected_result=true" "BRANCH_NAME=feature/D603345-6-setup-shared-base-docker-images"
   test "expected_result=true" "BRANCH_NAME=bugfix/D603345-6-setup-shared-base-docker-images"
-  test "expected_result=true" "BRANCH_NAME=hotfix/D603345-6-setup-shared-base-docker-images"
+  test "expected_result=true" "BRANCH_NAME=hotfix/D603345-6_setup-shared-base-docker-images"
 
   test "expected_result=false" "BRANCH_NAME=master"
   test "expected_result=false" "BRANCH_NAME=main/foobar"

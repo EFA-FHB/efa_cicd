@@ -76,7 +76,7 @@ _extract_version_core() {
 }
 
 _extract_issue_number() {
-  echo "${BRANCH_NAME}" | sed -E 's/^.+\/(D[0-9]{6}-[0-9]+).+$/\1/'
+  echo "${BRANCH_NAME}" | sed -E 's/^.+\/(D[0-9]+-[0-9]+).+$/\1/'
 }
 
 _extract_branch_prefix() {
