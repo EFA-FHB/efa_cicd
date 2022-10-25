@@ -51,13 +51,13 @@ runs:
           exit 1;
         fi
 
-        if [[ "${branch}" == development && ! "${release_type}" =~ major|minor ]]; then
-          echo >&2 "${release_type} releases can only be triggered from 'development'!"
+        if [[ "${branch}" == development && "${release_type}" == "patch" ]]; then
+          echo >&2 "Patch releases can only be triggered from a hotfix branch!"
           exit 1;
         fi
 
         if [[ "${branch}" =~ ^hotfix/.+ && "${release_type}" != "patch" ]]; then
-          echo >&2 "Patch releases can only be triggered from a hotfix branch!"
+          echo >&2 "${release_type} releases can only be triggered from 'development'!"
           exit 1;
         fi
 
