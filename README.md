@@ -15,7 +15,7 @@ This repository currently contains the following shared actions:
 - [azure_k8s_sp_login](shared_actions/azure_k8s_sp_login/README.md)
 - [setup_jdk_17](shared_actions/setup_jdk_17/README.md)
 - [gradle_xray_test](shared_actions/gradle_xray_test/README.md)
-- [docker_build_image](shared_actions/docker_build_push_image/README.md)
+- [docker_build_push_image](shared_actions/docker_build_push_image/README.md)
 - [create_release](shared_actions/create_release/README.md)
 - [trigger_deploy_workflow](shared_actions/trigger_deploy_workflow/README.md)
 - [check_branch_name](shared_actions/check_branch_name/README.md)
