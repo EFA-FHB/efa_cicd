@@ -22,7 +22,6 @@ This repository currently contains the following shared actions:
 - [create_image_tags](shared_actions/create_image_tags/README.md)
 - [get_version](shared_actions/get_version/README.md)
 
-
 ## Installation
 
 Repos can import the shared actions into their `.github` folder using the bash script [install_shared_actions.sh](install_shared_actions.sh).

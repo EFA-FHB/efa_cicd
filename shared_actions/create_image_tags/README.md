@@ -20,7 +20,6 @@ Name | Description | Example
 -- | -- | -- 
 `tags` | Space separated list of image tags | `2.0.0-beta-123 latest`, `2.0.0-213` [More examples](https://confluence.nortal.com/display/BVU/New+branching+strategy)
 
-
 ##Usage
 
 <pre>
