@@ -76,7 +76,7 @@ runs:
         EOF
 
         origImage=$(cat meta.json | jq ".tags[0]" | tr -d '"')
-        images=("${origImage}")
+        images=()
 
         origTag=$(echo "${origImage}" | cut -d ":" -f2)
 
