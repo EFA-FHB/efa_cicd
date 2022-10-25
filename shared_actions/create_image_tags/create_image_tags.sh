@@ -29,10 +29,14 @@ _create_tags() {
   if [[ ${BRANCH_NAME} =~ ^(feature|hotfix|bugfix)/.+ ]]; then
     local issue_number=$(_extract_issue_number)
     local branch_prefix=$(_extract_branch_prefix)
-    tags+=("${branch_prefix}-${issue_number}-${BUILD_NUMBER}" "${branch_prefix}-${issue_number}-latest")
+
+    for suffix in ${BUILD_NUMBER} latest; do {
+      tags+=("${version_core}-${branch_prefix}-${issue_number}-${suffix}")
+    } done
+
   fi
 
-  echo "${tags[@]}" | tr ' ' ','
+  echo "${tags[*]}"
 
 }
 

@@ -1,52 +1,45 @@
-name: docker_build_image
-description: "Builds and tags a container image with Docker"
+name: docker_build_push_image
+description: "Builds, tags, scans and pushes Docker container images"
 
 inputs:
   image:
-    description: "Value to use as name of docker container image"
+    description: "Value to use as name of Docker container image"
     required: true
   imageTags:
     description: "Tags used for tagging the image"
     required: true
   context:
     description: "Path to use as docker build context"
-    required: false
-    default: "."
+    required: true
   dockerfilePath:
     description: "Path of DockerFile"
-    required: false
-    default: "Dockerfile"
+    required: true
   scanImage:
     description: "Scan image for vulnerabilities"
     required: false
     default: "true"
+  pushImage:
+    description: "Whether to push docker images"
+    required: false
+    default: "true"
 
 outputs:
-  images:
-    description: "Name of tagged docker images"
-    value: "${{ steps.tag_images.outputs.images }}"
-  docker_image:
-    description: "Name of created container image"
-    value: "${{ steps.build_image.outputs.docker_image }}"
+  digest:
+    description: "SHA-Digest of created image"
+    value: "${{ steps.build_image.outputs.digest }}"
   tags:
-    description: "Tags of the container image"
-    value: "${{ steps.tag_image.outputs.tags }}"
-
+    description: "Space separated list of tags associated with SHA-Digest of creaed images"
+    value: "${{ steps.prepare_push.outputs.tags }}"
 runs:
   using: "composite"
   steps:
 
     - name: get primary tag
-      id: tags
-      env:
-        tags: ${{inputs.imageTags}}
+      id: tag_for_metadata
       shell: bash
       run: |
-        IFS="," read -r -a parts <<<"${{env.imageTags}}"
+        IFS=" " read -r -a parts <<<"${{inputs.imageTags}}"
         echo "tag=${parts[0]}" >> $GITHUB_OUTPUT
-
-        #added backwards compatibility
-        echo "tags=${parts[*]}" >> $GITHUB_OUTPUT
 
     - name: Docker meta
       id: meta
@@ -54,7 +47,7 @@ runs:
       with:
         images: ${{inputs.image}}
         tags: |
-          type=raw,value=${{steps.tags.outputs.tag}}
+          type=raw,value=${{steps.tag_for_metadata.outputs.tag}}
 
     - name: Build and push
       id: build_image
@@ -62,7 +55,7 @@ runs:
       with:
         context: ${{inputs.context}}
         file: ${{inputs.dockerFilePath}}
-        push: false
+        push: false #do not push here
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
@@ -80,9 +73,9 @@ runs:
 
         origTag=$(echo "${origImage}" | cut -d ":" -f2)
 
-        IFS="," read -r -a additionalTags <<<"${{inputs.imageTags}}"
+        IFS=" " read -r -a imageTags <<<"${{inputs.imageTags}}"
 
-        for newTag in ${additionalTags[*]}; do {
+        for newTag in ${imageTags[*]}; do {
           newImage="${origImage/$origTag/$newTag}"
           docker tag "${origImage}" "${newImage}"
           images+=("${newImage}")
@@ -90,7 +83,7 @@ runs:
 
         echo "images=${images[*]}" >> $GITHUB_OUTPUT
         echo "image=${origImage}" >> $GITHUB_OUTPUT
-
+        echo "tags=${imageTags}" >> $GITHUB_OUTPUT
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}
@@ -99,6 +92,7 @@ runs:
         args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.prepare_push.outputs.image}}
 
     - name: Push images
+      if: ${{inputs.pushImage != 'false' }}
       id: push_images
       shell: bash
       env:

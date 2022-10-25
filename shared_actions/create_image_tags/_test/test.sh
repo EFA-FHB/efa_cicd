@@ -11,7 +11,6 @@ failed=0
 passed=0
 
 test() {
-
   local expected_exit=
   local expected_result=
 
@@ -21,7 +20,7 @@ test() {
 
   for args in $(echo "${@}" | tr ';' ' '); do {
    IFS="=" read -r -a arr <<< "${args}"
-   declare "${arr[0]}"="${arr[1]}"
+   declare "${arr[0]}"="${arr[1]/\%\%/ }"
   } done
 
   local check="input: '$2'\n"
@@ -68,21 +67,21 @@ main() {
   test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2"
   test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2-"
   test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2-0"
-
+ 
   test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3"
   test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-SNAPSHOT"
-
+ 
   test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-"
   test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1"
   test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1.rxr.232"
   test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1.rxr.232-"
-
-
+ 
+ 
   test "expected_result=1.2.3-42" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=1.2.3-beta-42,latest" "BRANCH_NAME=development;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=feature-D603345-6-42,feature-D603345-6-latest" "BRANCH_NAME=feature/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=bugfix-D603345-6-42,bugfix-D603345-6-latest" "BRANCH_NAME=bugfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=hotfix-D603345-6-42,hotfix-D603345-6-latest" "BRANCH_NAME=hotfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-beta-42%%latest" "BRANCH_NAME=development;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-feature-D603345-6-42%%1.2.3-feature-D603345-6-latest" "BRANCH_NAME=feature/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-bugfix-D603345-6-42%%1.2.3-bugfix-D603345-6-latest" "BRANCH_NAME=bugfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-hotfix-D603345-6-42%%1.2.3-hotfix-D603345-6-latest" "BRANCH_NAME=hotfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
 
 
   echo "passed=${passed};failed=${failed}"

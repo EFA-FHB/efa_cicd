@@ -1,26 +1,35 @@
-## check_branch_name
+## get_version
 
-Checks the passed `branchName` if it complies with the [project branching strategy](https://confluence.nortal.com/display/BVU/New+branching+strategy).
+Parses a version number from a specified file.
+The specified file is looked up in the project root (`${{github.workspace}}`).
 
-##Inputs
-### `branchName (required)`
-**Required** The branch name to check
+The following files are supported:
+- `gradle.properties`
+- `package.json`
 
-### `debug`
-Whether to enable script debugging
+The file _must_ exist in the `${{github.workspace}}` (resolves to project root).
 
-##Outputs
-### `valid` 
-Whether the branch is valid or not [true|false]
+## Inputs
+
+Name | Mandatory | Description | Default | Example
+-- | -- | -- | -- | --
+`versionFileName` | `yes` | Name of version file to extract version information from. | | `gradle.properties` or `package.json`
+
+## Outputs
+
+Name | Description | Example
+-- | -- | -- 
+`version` | The extracted version information | `1.0.0`
+
 
 ##Usage
 
 <pre>
-    - name: Project setup
-      with:
-        branchName: ${{github.head_ref | github.ref_name }}
-        debug: "true"
-      uses: ./.github/actions/check_branch_name
+      - name: get version
+        id: get_version
+        uses: ./.github/actions/get_version
+        with:
+          versionFileName: "gradle.properties"
 </pre>
 
 

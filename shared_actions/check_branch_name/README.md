@@ -1,25 +1,26 @@
 ## check_branch_name
 
-Checks the passed `branchName` if it complies with the [project branching strategy](https://confluence.nortal.com/display/BVU/New+branching+strategy).
+Checks the passed `branchName` for compliance with the [project branching strategy](https://confluence.nortal.com/display/BVU/New+branching+strategy).
 
-##Inputs
-### `branchName (required)`
-**Required** The branch name to check
+## Inputs
 
-### `debug`
-Whether to enable script debugging
+Name | Mandatory | Description | Default | Example
+-- | -- | -- | -- | --
+`branchName` | `yes` | Name of branch to check | | `feature/D603345-1104-github-actions-enforce-branching-strategy`, `${{github.ref_name}}`
+`debug` | `no` | Whether to enable script debugging | `false` | 
 
-##Outputs
-### `valid` 
-Whether the branch is valid or not [true|false]
+## Outputs
+
+Name | Description | Example
+-- | -- | -- 
+`valid` | Whether the branch name is valid | `true` or `false`
 
 ##Usage
 
 <pre>
     - name: Project setup
       with:
-        branchName: ${{github.head_ref | github.ref_name }}
-        debug: "true"
+        branchName: ${{ github.ref_name }}
       uses: ./.github/actions/check_branch_name
 </pre>
 

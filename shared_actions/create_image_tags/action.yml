@@ -17,7 +17,7 @@ inputs:
 
 outputs:
   tags:
-    description: "Comma delimited list of image tags"
+    description: "Space separated list of image tags"
     value: ${{steps.create_image_tags.outputs.tags}}
 runs:
   using: "composite"

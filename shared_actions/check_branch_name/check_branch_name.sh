@@ -11,7 +11,7 @@ main() {
 
   if [[ "${BRANCH_NAME}" =~ ^(main|development)$ ]]; then
     result=true
-  elif [[ "${BRANCH_NAME}" =~ ^(feature|hotfix|bugfix)/D[0-9]{6}-[0-9]+-.+ ]]; then
+  elif [[ "${BRANCH_NAME}" =~ ^(feature|hotfix|bugfix)/D[0-9]+-[0-9]+-.+ ]]; then
     result=true
   else
     result=false
