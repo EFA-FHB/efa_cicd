@@ -20,6 +20,7 @@ This repository currently contains the following shared actions:
 - [trigger_deploy_workflow](shared_actions/trigger_deploy_workflow/README.md)
 - [check_branch_name](shared_actions/check_branch_name/README.md)
 - [create_image_tags](shared_actions/create_image_tags/README.md)
+- [get_version](shared_actions/get_version/README.md)
 
 
 ## Installation
