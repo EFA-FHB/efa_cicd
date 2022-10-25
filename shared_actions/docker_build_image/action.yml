@@ -49,12 +49,12 @@ runs:
         echo "tags=${parts[*]}" >> $GITHUB_OUTPUT
 
 
-        metadata-action-tags=()
+        tags=()
         for tag in ${parts[*]}; do {
-          metadata-action-tags+=("type=raw,value=${tag}")
+          tags+=("type=raw,value=${tag}")
         } done
 
-        echo "tags=${metadata-action-tags[@]}" >> $GITHUB_OUTPUT
+        echo "tags=${tags[@]}" >> $GITHUB_OUTPUT
 
 
     - name: Docker meta
