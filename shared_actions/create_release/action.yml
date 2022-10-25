@@ -23,11 +23,43 @@ inputs:
   release_type:
     description: "Indicator of the release type"
     required: true
+  versionFile:
+    description: "Version file to update version information"
+    required: true
 
 runs:
   using: "composite"
 
   steps:
+
+    - name: check version file
+      shell: bash
+      run: |
+        if [[ ! -f "${{github.workspace}}/gradle.properties" ]]; then
+          echo >&2 "Required file 'gradle.properties' does not exist!"
+          exit 1;
+        fi
+
+    - name: check semver
+      shell: bash
+      run: |
+        branch="${{ github.ref_name }}"
+        release_type="${{ inputs.release_type }}"
+
+        if [[ ! "${branch}" =~ ^(development|hotfix/.+)$ ]]; then
+          echo >&2 "Origin branch must be 'development' or a hotfix branch!"
+          exit 1;
+        fi
+
+        if [[ "${branch}" == development && ! "${release_type}" =~ major|minor ]]; then
+          echo >&2 "${release_type} releases can only be triggered from 'development'!"
+          exit 1;
+        fi
+
+        if [[ "${branch}" =~ ^hotfix/.+ && "${release_type}" != "patch" ]]; then
+          echo >&2 "Patch releases can only be triggered from a hotfix branch!"
+          exit 1;
+        fi
 
     - name: import gpg
       id: import_gpg
@@ -46,24 +78,18 @@ runs:
         github_token: ${{ inputs.token }}
         default_bump: ${{inputs.release_type}}
         dry_run: true
-        release_branches: "release.*,hotfix.*,main"
+        release_branches: "release.*,hotfix.*,main,development"
 
-    - name: find version file
-      id: version_file
+    - name: update gradle.properties
+      env:
+        newVersion: ${{ steps.tag.outputs.new_version }}
       shell: bash
       run: |
-        for file in gradle.properties package.json; do {
-          find $file &> /dev/null
-          if [[ $(echo $?) -eq 0 ]]; then
-            echo "::set-output name=value::$file"
-            break;
-          fi
-        } done
+        sed -i -E "s/(version=).*/\1${{env.newVersion}}/" "${{github.workspace}}/gradle.properties"
 
     - name: commit tag + version
       shell: bash
       env:
-        versionFile: ${{steps.version_file.outputs.value}}
         newTag: ${{steps.tag.outputs.new_tag}}
         newVersion: ${{steps.tag.outputs.new_version}}
         GITHUB_TOKEN: ${{ inputs.token }}
@@ -72,27 +98,15 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
-
-        if [[ "${{env.versionFile}}" == "gradle.properties" ]]; then
-          sed -i -E "s/(version=).*/\1${{env.newVersion}}/" ${{env.versionFile}}
-        fi
-
-        if [[ "${{env.versionFile}}" == "package.json" ]]; then
-          sed -i -E "s/(\"version\": ).*/\1\"${{env.newVersion}}\" /" ${{env.versionFile}}
-        fi
-
-        git commit -S -m "[github] update version" -- ${{env.versionFile}} &> /dev/null
-
-        tag="${{env.newTag}}"
-
-        git tag -sam "[github] create new tag" $tag
+        git commit -S -m "[github] update version to ${{ env.newVersion }}" -- ${{github.workspace}}/gradle.properties &> /dev/null
+        git tag -sam "[github] create new tag ${{ env.newTag }}" ${{ env.newTag }}
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
       with:
         token: ${{ inputs.token }}
         tags: true
-        branch: ${{github.ref_name}}
+        branch: "main"
 
     - name: calculate new snapshot version
       id: snapshot_version
@@ -108,10 +122,16 @@ runs:
         version="$(echo ${parts[*]} | tr ' ' '.')-SNAPSHOT"
         echo "::set-output name=value::${version}"
 
+    - name: update gradle.properties
+      env:
+        snapshotVersion: ${{steps.snapshot_version.outputs.value}}
+      shell: bash
+      run: |
+        sed -i -E "s/(version=).*/\1${{env.snapshotVersion}}/" "${{github.workspace}}/gradle.properties"
+
     - name: commit SNAPSHOT version
       shell: bash
       env:
-        versionFile: ${{steps.version_file.outputs.value}}
         snapshotVersion: ${{steps.snapshot_version.outputs.value}}
         GITHUB_TOKEN: ${{ inputs.token }}
         GIT_AUTHOR_NAME: ${{ steps.import_gpg.outputs.name }}
@@ -120,38 +140,14 @@ runs:
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
 
-        if [[ "${{env.versionFile}}" == "gradle.properties" ]]; then
-          sed -i -E "s/(version=).*/\1${{env.snapshotVersion}}/" ${{env.versionFile}}
-        fi
-
-        if [[ "${{env.versionFile}}" == "package.json" ]]; then
-          sed -i -E "s/(\"version\": ).*/\1\"${{env.snapshotVersion}}\" /" ${{env.versionFile}}
-        fi
-
-        git commit -S -m "[github] new SNAPSHOT version" -- ${{env.versionFile}} &> /dev/null
+        git commit -S -m "[github] update version to ${{ env.snapshotVersion }}" -- "${{github.workspace}}/gradle.properties" &> /dev/null
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
       with:
         token: ${{ inputs.token }}
-        branch: ${{github.ref_name}}
-
-
-
-    #- name: merge main
-    #  if: ${{ github.ref_name != 'main' }}
-    #  shell: bash
-    #  run: |
-    #    git checkout main
-    #    git pull
-    #    git merge ${{github.ref_name}}
-    #
-    #- name: push update to main
-    #  if: ${{ github.ref_name != 'main' }}
-    #  uses: CasperWA/push-protected@v2.10.0
-    #  with:
-    #    token: ${{ inputs.token }}
-    #    branch: main
+        tags: true
+        branch: "development"
 
     - name: changelog config template
       id: changelog_config_path
