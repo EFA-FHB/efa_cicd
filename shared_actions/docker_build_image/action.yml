@@ -49,19 +49,20 @@ runs:
         echo "tags=${parts[*]}" >> $GITHUB_OUTPUT
 
     - name: Docker meta
+      id: meta
       uses: docker/metadata-action@v4
       with:
         images: ${{inputs.image}}
         tags: |
           type=raw,value=${{steps.tag_image.outputs.tag}}
-    
+
 
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
         context: ${{inputs.context}}
         file: ${{inputs.dockerFilePath}}
-        push: true
+        push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
