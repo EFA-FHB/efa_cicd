@@ -37,7 +37,7 @@ runs:
   steps:
 
     - name: get primary tag
-      id: tag_image
+      id: tags
       env:
         tags: ${{inputs.imageTags}}
       shell: bash
@@ -54,10 +54,10 @@ runs:
       with:
         images: ${{inputs.image}}
         tags: |
-          type=raw,value=${{steps.tag_image.outputs.tag}}
-
+          type=raw,value=${{steps.tags.outputs.tag}}
 
     - name: Build and push
+      id: build_image
       uses: docker/build-push-action@v3
       with:
         context: ${{inputs.context}}
@@ -66,8 +66,47 @@ runs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-    #- name: Scan image for vulnerabilities
-    #  if: ${{inputs.scanImage != 'false' }}
-    #  uses: docker://docker.io/aquasec/trivy
-    #  with:
-    #    args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.build_image.outputs.docker_image}}
+    - name: Apply additional tags
+      id: prepare_push
+      shell: bash
+      run: |
+
+        cat <<EOF > meta.json
+          ${{steps.meta.outputs.json}}
+        EOF
+
+        origImage=$(cat meta.json | jq ".tags[0]" | tr -d '"')
+        origTag=$(echo "${image}" | cut -d ":" -f2)
+
+        additionalTags=${{steps.tags.outputs.tags}}
+
+        images=("${origImage}")
+
+        for newTag in $additionalTags; do {
+          newImage="${origImage/$origTag/$newTag}"
+          docker tag "${origImage}" "${newImage}"
+          images+=("${newImage}")
+        } done
+
+        echo "images=${images[*]}" >> $GITHUB_OUTPUT
+        echo "image=${origImage}" >> $GITHUB_OUTPUT
+
+
+    - name: Scan image for vulnerabilities
+      if: ${{inputs.scanImage != 'false' }}
+      uses: docker://docker.io/aquasec/trivy
+      with:
+        args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.prepare_push.outputs.image}}
+
+    - name: Push images
+      id: push_images
+      shell: bash
+      env:
+        images: ${{ steps.prepare_push.outputs.images }}
+      run: |
+        echo '### Pushed Docker Images' >> $GITHUB_STEP_SUMMARY
+
+        for image in ${{ env.images }}; do {
+          docker push $image
+          echo "- **$image**" >> $GITHUB_STEP_SUMMARY
+        } done
