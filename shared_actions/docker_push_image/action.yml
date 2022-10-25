@@ -20,5 +20,5 @@ runs:
 
         for image in ${{ env.images }}; do {
           docker push $image
-          echo '- $image' >> $GITHUB_STEP_SUMMARY
+          echo "- **$image**" >> $GITHUB_STEP_SUMMARY
         } done

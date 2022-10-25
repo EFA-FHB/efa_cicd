@@ -36,11 +36,11 @@ runs:
   using: "composite"
   steps:
 
-    - name: current date
-      id: current_date
-      shell: bash
-      run: |
-        echo "::set-output name=date::$(date --rfc-3339=seconds)"
+   # - name: current date
+   #   id: current_date
+   #   shell: bash
+   #   run: |
+   #     echo "::set-output name=date::$(date --rfc-3339=seconds)"
 
     - name: get primary tag
       id: tag_image
@@ -64,65 +64,73 @@ runs:
         tags: |
           type=raw,value=${{env.tag}}
 
-    - name: Build Docker Image
-      id: build_image
-      shell: bash
-      env:
-        tags: ${{inputs.imageTags}}
-      run: |
-        cat <<EOF > meta.json
-          ${{steps.meta.outputs.json}}
-        EOF
-
-        image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
-        echo "image=${image}" >> $GITHUB_OUTPUT
-
-        cat meta.json | jq ".labels" \
-                  | tr -d '{} ' \
-                  | grep -v "^$" \
-                  | sed 's/:/=/' \
-                  | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
-                  | tr -d "," > labels
-
-
-        cmd="docker build"
-        while read label; do { cmd="${cmd} --label $label";  } done < labels
-
-        cmd="$cmd --label org.label-schema.vcs-ref="${{github.sha}}""
-
-        cmd="$cmd -f ${{ inputs.dockerfilePath }}"
-        cmd="$cmd -t $image"
-        cmd="$cmd ${{ inputs.context }}"
-
-        echo "$cmd"
-        $cmd
-
-        echo "docker_image=${image}" >> $GITHUB_OUTPUT
-
-    - name: tag images
-      id: tag_images
-      env:
-        tags: ${{inputs.imageTags}}
-        origImage: ${{ steps.build_image.outputs.docker_image }}
-      shell: bash
-      run: |
-        origImage="${{ env.origImage }}"
-        repo=$(echo ${origImage} | cut -d":" -f1)
-        IFS="," read -r -a imageTags <<<"${{env.imageTags}}"
-        images=()
-
-        for tag in ${imageTags[*]}; do {
-          newImage="${repo}:${tag}"
-          docker tag $origImage $newImage
-          images+=("${newImage}")
-        } done
-
-        echo "images=${images[*]}" >> $GITHUB_OUTPUT
+    #- name: Build Docker Image
+    #  id: build_image
+    #  shell: bash
+    #  env:
+    #    tags: ${{inputs.imageTags}}
+    #  run: |
+    #    cat <<EOF > meta.json
+    #      ${{steps.meta.outputs.json}}
+    #    EOF
+    #
+    #    image=$(cat meta.json | jq ".tags[0]" | tr -d '"')
+    #    echo "image=${image}" >> $GITHUB_OUTPUT
+    #
+    #    cat meta.json | jq ".labels" \
+    #              | tr -d '{} ' \
+    #              | grep -v "^$" \
+    #              | sed 's/:/=/' \
+    #              | sed -E "s/^\"([^\"]+)\"(.*)/\1\2/" \
+    #              | tr -d "," > labels
+    #
+    #
+    #    cmd="docker build"
+    #    while read label; do { cmd="${cmd} --label $label";  } done < labels
+    #
+    #    cmd="$cmd --label org.label-schema.vcs-ref="${{github.sha}}""
+    #
+    #    cmd="$cmd -f ${{ inputs.dockerfilePath }}"
+    #    cmd="$cmd -t $image"
+    #    cmd="$cmd ${{ inputs.context }}"
+    #
+    #    echo "$cmd"
+    #    $cmd
+    #
+    #    echo "docker_image=${image}" >> $GITHUB_OUTPUT
 
 
-
-    - name: Scan image for vulnerabilities
-      if: ${{inputs.scanImage != 'false' }}
-      uses: docker://docker.io/aquasec/trivy
+    - name: Build and push
+      uses: docker/build-push-action@v3
       with:
-        args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.build_image.outputs.docker_image}}
+        context: ${{inputs.context}}
+        file: ${{inputs.dockerFilePath}}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    #- name: tag images
+    #  id: tag_images
+    #  env:
+    #    tags: ${{inputs.imageTags}}
+    #    origImage: ${{ steps.build_image.outputs.docker_image }}
+    #  shell: bash
+    #  run: |
+    #    origImage="${{ env.origImage }}"
+    #    repo=$(echo ${origImage} | cut -d":" -f1)
+    #    IFS="," read -r -a imageTags <<<"${{env.imageTags}}"
+    #    images=()
+    #
+    #    for tag in ${imageTags[*]}; do {
+    #      newImage="${repo}:${tag}"
+    #      docker tag $origImage $newImage
+    #      images+=("${newImage}")
+    #    } done
+    #
+    #    echo "images=${images[*]}" >> $GITHUB_OUTPUT
+    #
+    #- name: Scan image for vulnerabilities
+    #  if: ${{inputs.scanImage != 'false' }}
+    #  uses: docker://docker.io/aquasec/trivy
+    #  with:
+    #    args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.build_image.outputs.docker_image}}
