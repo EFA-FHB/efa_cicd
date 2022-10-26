@@ -40,4 +40,11 @@ runs:
           exit 1
         fi
 
+        tags=
+        tags=$(bash $file)
+        exit_code="$?"
         echo "tags=$(bash $file)" >> $GITHUB_OUTPUT
+        exit $exit_code
+
+
+
