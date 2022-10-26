@@ -14,7 +14,7 @@ test() {
   local expected_exit=
   local expected_result=
 
-  local BRANCH_NAME=
+  local REF_NAME=
   local BUILD_NUMBER=
   local SEMVER=
 
@@ -26,7 +26,7 @@ test() {
   local check="input: '$2'\n"
 
 
-  export BRANCH_NAME=${BRANCH_NAME}
+  export REF_NAME=${REF_NAME}
   export BUILD_NUMBER=${BUILD_NUMBER}
   export SEMVER=${SEMVER}
 
@@ -60,28 +60,28 @@ test() {
 main() {
 
   test "expected_exit=1"
-  test "expected_exit=1" "BRANCH_NAME="
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER="
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER="
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1"
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2"
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2-"
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2-0"
+  test "expected_exit=1" "REF_NAME="
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER="
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER="
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1"
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2"
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2-"
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2-0"
 
-  test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-SNAPSHOT"
+  test "expected_exit=0" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_exit=0" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-SNAPSHOT"
 
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-"
-  test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1"
-  test "expected_exit=0" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1.rxr.232"
-  test "expected_exit=1" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1.rxr.232-"
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-"
+  test "expected_exit=0" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1"
+  test "expected_exit=0" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1.rxr.232"
+  test "expected_exit=1" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3-rc.1.rxr.232-"
 
-
-  test "expected_result=1.2.3-42" "BRANCH_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=1.2.3-beta-42%%latest" "BRANCH_NAME=development;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=1.2.3-feature-D603345-6-42%%1.2.3-feature-D603345-6-latest" "BRANCH_NAME=feature/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=1.2.3-bugfix-D603345-6-42%%1.2.3-bugfix-D603345-6-latest" "BRANCH_NAME=bugfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
-  test "expected_result=1.2.3-hotfix-D603345-6-42%%1.2.3-hotfix-D603345-6-latest" "BRANCH_NAME=hotfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-42" "REF_NAME=v5.0.0;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-42" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-beta-42%%latest" "REF_NAME=development;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-feature-D603345-6-42%%1.2.3-feature-D603345-6-latest" "REF_NAME=feature/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-bugfix-D603345-6-42%%1.2.3-bugfix-D603345-6-latest" "REF_NAME=bugfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
+  test "expected_result=1.2.3-hotfix-D603345-6-42%%1.2.3-hotfix-D603345-6-latest" "REF_NAME=hotfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
 
 
   echo "passed=${passed};failed=${failed}"

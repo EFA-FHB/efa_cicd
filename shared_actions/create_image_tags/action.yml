@@ -2,8 +2,8 @@ name: create_image_tag_names
 description: "Create image tags based on branch name input"
 
 inputs:
-  branchName:
-    description: "Name of branch"
+  refName:
+    description: "Name of git ref (branch or tag)"
     required: true
   buildNumber:
     description: "Number of the build run"
@@ -28,7 +28,7 @@ runs:
       id: create_image_tags
       shell: bash
       env:
-        BRANCH_NAME: ${{inputs.branchName}}
+        REF_NAME: ${{inputs.refName}}
         SEMVER: ${{inputs.semver}}
         BUILD_NUMBER: ${{inputs.buildNumber}}
         DEBUG: ${{inputs.debug}}

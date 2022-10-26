@@ -9,7 +9,7 @@ The tags can be used for `docker build` or `docker tag` operations.
 
 Name | Mandatory | Description | Default | Example
 -- | -- | -- | -- | --
-`branchName` | `yes` | Name of branch to check | | `feature/D603345-1104-github-actions-enforce-branching-strategy`, `${{github.ref_name}}`
+`refName` | `yes` | Name of branch to check | | `feature/D603345-1104-github-actions-enforce-branching-strategy`, `${{github.refName}}`
 `buildNumber` | `yes` | The current build number | | `12`, `${{ github.run_number }}`
 `semver` | `yes` | A version number complying with [Semver 2.0](https://semver.org/)
 `debug` | `no` | Whether to enable script debugging | `false` | 
@@ -34,7 +34,7 @@ Name | Description | Example
         uses: ./.github/actions/create_image_tags
         with:
           semver: ${{steps.get_version.outputs.version}}
-          branchName: ${{ github.ref_name }}
+          refName: ${{ github.ref_name }}
           buildNumber: ${{ github.run_number }}
 </pre>
 
