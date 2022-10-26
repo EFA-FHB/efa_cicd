@@ -109,7 +109,7 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
-        git pull origin main
+        git pull main
         git commit -S -m "[github] updated ${{inputs.release_type}} version to ${{ env.newVersion }}" -- gradle.properties &> /dev/null
         git tag -sam "[github] created new tag ${{ env.newTag }}" ${{ env.newTag }}
 
