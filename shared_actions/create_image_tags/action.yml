@@ -25,13 +25,13 @@ runs:
       id: get_ref
       shell: bash
       run: |
-        refName=
-        if [[ "${{ github.event_name }} == 'pull_request'" ]]; then
-          refName="${{ github.head_ref }}"
+        ref_name=${{ github.ref_name }}
+        head_ref=${{ github.head_ref }}
+        if [[ "${ref_name}" =~ merge/$ ]]; then
+          echo "refName=${head_ref}" >> $GITHUB_OUTPUT
         else
-          refName="${{ github.ref_name }}"
+          echo "refName=${ref_name}" >> $GITHUB_OUTPUT
         fi
-        echo "refName=${refName}" >> $GITHUB_OUTPUT
 
     - name: current version
       id: get_version
