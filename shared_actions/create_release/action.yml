@@ -88,7 +88,7 @@ runs:
         newVersion: ${{ steps.tag.outputs.new_version }}
       shell: bash
       run: |
-        sed -i -E "s/(version=).*/\1${{env.newVersion}}/" "${{github.workspace}}/gradle.properties"
+        sed -i -E "s/(version=).*/\1${{env.newVersion}}/" gradle.properties
 
     - name: commit tag + version
       shell: bash
@@ -101,7 +101,7 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
-        git commit -S -m "[github] update ${release_type} version to ${{ env.newVersion }}" -- ${{github.workspace}}/gradle.properties &> /dev/null
+        git commit -S -m "[github] update ${release_type} version to ${{ env.newVersion }}" -- gradle.properties &> /dev/null
         git tag -sam "[github] create new tag ${{ env.newTag }}" ${{ env.newTag }}
 
     - name: git push
@@ -113,33 +113,27 @@ runs:
         debug: true
         force: true
 
-    - name: Start SSH via Ngrok
-      shell: bash
-      run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
-      env:
-        # After sign up on the https://ngrok.com/
-        # You can find this token here: https://dashboard.ngrok.com/get-started/setup
-        NGROK_TOKEN: ${{ inputs.ngrokToken }}
+#    - name: Start SSH via Ngrok
+#      shell: bash
+#      run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
+#      env:
+#        # After sign up on the https://ngrok.com/
+#        # You can find this token here: https://dashboard.ngrok.com/get-started/setup
+#        NGROK_TOKEN: ${{ inputs.ngrokToken }}
+#
+#        # This password you will use when authorizing via SSH
+#        # USER_PASS: ${{ secrets.USER_PASS }}
+#        USER_PASS: debug
+#
+#    - name: Don't kill instace
+#      shell: bash
+#      run: sleep 1h # Prevent to killing instance after failure
 
-        # This password you will use when authorizing via SSH
-        # USER_PASS: ${{ secrets.USER_PASS }}
-        USER_PASS: debug
-
-    - name: Don't kill instace
-      shell: bash
-      run: sleep 1h # Prevent to killing instance after failure
-
-
-    - name: merge main into develop
+    - name: update development
       shell: bash
       run: |
-        git checkout main
-        git pull
         git checkout development
         git push
-        git merge main
-        git commit -am"[github] catchup merge with main"
-
 
     - name: calculate new snapshot version
       id: snapshot_version
@@ -160,7 +154,7 @@ runs:
         snapshotVersion: ${{steps.snapshot_version.outputs.value}}
       shell: bash
       run: |
-        sed -i -E "s/(version=).*/\1${{env.snapshotVersion}}/" "${{github.workspace}}/gradle.properties"
+        sed -i -E "s/(version=).*/\1${{env.snapshotVersion}}/" gradle.properties
 
     - name: commit SNAPSHOT version
       shell: bash
@@ -173,7 +167,7 @@ runs:
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
 
-        git commit -S -m "[github] update version to ${{ env.snapshotVersion }}" -- ${{github.workspace}}/gradle.properties &> /dev/null
+        git commit -S -m "[github] update version to ${{ env.snapshotVersion }}" -- gradle.properties &> /dev/null
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
