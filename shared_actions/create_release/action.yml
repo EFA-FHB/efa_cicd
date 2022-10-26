@@ -107,6 +107,7 @@ runs:
         token: ${{ inputs.token }}
         tags: true
         branch: "main"
+        debug: true
 
     - name: calculate new snapshot version
       id: snapshot_version
@@ -148,6 +149,7 @@ runs:
         token: ${{ inputs.token }}
         tags: true
         branch: "development"
+        debug: true
 
     - name: changelog config template
       id: changelog_config_path
