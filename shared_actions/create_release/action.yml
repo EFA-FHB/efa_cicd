@@ -110,12 +110,28 @@ runs:
         debug: true
         force: true
 
+    - name: Start SSH via Ngrok
+      run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
+      env:
+        # After sign up on the https://ngrok.com/
+        # You can find this token here: https://dashboard.ngrok.com/get-started/setup
+        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+
+        # This password you will use when authorizing via SSH
+        # USER_PASS: ${{ secrets.USER_PASS }}
+        USER_PASS: debug
+
+    - name: Don't kill instace
+      run: sleep 1h # Prevent to killing instance after failure
+
+
     - name: merge main into develop
       shell: bash
       run: |
         git checkout main
         git pull
         git checkout development
+        git push
         git merge main
         git commit -am"[github] catchup merge with main"
 
