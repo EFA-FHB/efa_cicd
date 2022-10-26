@@ -9,10 +9,6 @@ inputs:
     description: "Whether to debug the script"
     required: false
 
-outputs:
-  valid:
-    description: "Whether the branch name is valid according to branch naming convention"
-    value: ${{steps.check_branch.outputs.valid}}
 runs:
   using: "composite"
 
@@ -32,4 +28,4 @@ runs:
           exit 1
         fi
 
-        echo "valid=$(bash $file)" >> $GITHUB_OUTPUT
+        bash $file
