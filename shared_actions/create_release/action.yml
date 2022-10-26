@@ -83,12 +83,12 @@ runs:
         dry_run: true
         release_branches: "release.*,hotfix.*,main,development"
 
-    - name: catchup ${{github.ref_name}} => main (no push)
-   #   if: startsWith(github.ref_name, 'hotfix/')
-      shell: bash
-      run: |
-        git pull origin main
-        git status
+#    - name: catchup ${{github.ref_name}} => main (no push)
+#   #   if: startsWith(github.ref_name, 'hotfix/')
+#      shell: bash
+#      run: |
+#        git pull origin main
+#        git status
 #        git push
 
     - name: update gradle.properties
@@ -109,6 +109,7 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
+        git pull origin main
         git commit -S -m "[github] updated ${{inputs.release_type}} version to ${{ env.newVersion }}" -- gradle.properties &> /dev/null
         git tag -sam "[github] created new tag ${{ env.newTag }}" ${{ env.newTag }}
 
