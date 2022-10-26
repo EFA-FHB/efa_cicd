@@ -119,7 +119,7 @@ runs:
         tags: true
         branch: "main"
         debug: true
-        #force: true
+        force: true
 
     - name: hotfix - remove branch
       if: startsWith(github.ref_name, 'hotfix/')
