@@ -2,9 +2,6 @@ name: check_branch_name
 description: "Checks a branch name for validity"
 
 inputs:
-  refName:
-    description: "Name of git ref (branch or tag)"
-    required: true
   debug:
     description: "Whether to debug the script"
     required: false
@@ -14,11 +11,23 @@ runs:
 
   steps:
 
+    - name: get ref to check
+      id: get_ref
+      shell: bash
+      run: |
+        refName=
+        if [[ "${{github.event_name == 'push' }}" ]]; then
+          refName="${{ github.ref_name }}"
+        else
+          refName="${{ github.head_ref }}"
+        fi
+        echo "refName=${refName}" >> $GITHUB_OUTPUT
+
     - name: check branch
       id: check_branch
       shell: bash
       env:
-        REF_NAME: ${{inputs.refName}}
+        REF_NAME: ${{steps.get_ref_outputs.refName}}
         DEBUG: ${{inputs.debug}}
       run: |
         basename=$(echo "${{github.action_path}}" | xargs -I% basename %)
