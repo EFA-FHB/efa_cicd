@@ -108,6 +108,7 @@ runs:
         tags: true
         branch: "main"
         debug: true
+        force: true
 
     - name: calculate new snapshot version
       id: snapshot_version
@@ -147,7 +148,6 @@ runs:
       uses: CasperWA/push-protected@v2.10.0
       with:
         token: ${{ inputs.token }}
-        tags: true
         branch: "development"
         debug: true
 
