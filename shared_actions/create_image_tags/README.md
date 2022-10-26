@@ -1,6 +1,10 @@
 ## create_image_tags
 
-Produces a space separated string of tags calculated from the passed `inputs`.
+Produces a space separated string of tags calculated from the current version information and 
+the branch reference. The version information is retrived from `gradle.properties` or `package.json` (in that order).
+If neither file is present or does not contain a version information, the action exists with `exit code: 1`
+and an error message. 
+
 The tags produced comply with the [project branching strategy](https://confluence.nortal.com/display/BVU/New+branching+strategy)
 
 The tags can be used for `docker build` or `docker tag` operations. 
@@ -9,9 +13,6 @@ The tags can be used for `docker build` or `docker tag` operations.
 
 Name | Mandatory | Description | Default | Example
 -- | -- | -- | -- | --
-`refName` | `yes` | Name of branch to check | | `feature/D603345-1104-github-actions-enforce-branching-strategy`, `${{github.refName}}`
-`buildNumber` | `yes` | The current build number | | `12`, `${{ github.run_number }}`
-`semver` | `yes` | A version number complying with [Semver 2.0](https://semver.org/)
 `debug` | `no` | Whether to enable script debugging | `false` | 
 
 ## Outputs
@@ -23,19 +24,9 @@ Name | Description | Example
 ##Usage
 
 <pre>
-      - name: get version
-        id: get_version
-        uses: ./.github/actions/get_version
-        with:
-          versionFileName: "gradle.properties"
-
       - name: create image tags
         id: create_image_tags
         uses: ./.github/actions/create_image_tags
-        with:
-          semver: ${{steps.get_version.outputs.version}}
-          refName: ${{ github.ref_name }}
-          buildNumber: ${{ github.run_number }}
 </pre>
 
 

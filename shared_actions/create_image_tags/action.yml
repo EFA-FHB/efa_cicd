@@ -2,9 +2,6 @@ name: create_image_tag_names
 description: "Create image tags based on branch name input"
 
 inputs:
-  refName:
-    description: "Name of git ref (branch or tag)"
-    required: true
   buildNumber:
     description: "Number of the build run"
     required: true
@@ -24,13 +21,41 @@ runs:
 
   steps:
 
+    - name: get ref to check
+      id: get_ref
+      shell: bash
+      run: |
+        refName=
+        if [[ "${{github.event_name == 'push' }}" ]]; then
+          refName="${{ github.ref_name }}"
+        else
+          refName="${{ github.head_ref }}"
+        fi
+        echo "refName=${refName}" >> $GITHUB_OUTPUT
+
+    - name: current version
+      id: get_version
+      shell: bash
+      run: |
+
+        if [[ -f gradle.properties ]]; then
+          version=$(grep -E "version" gradle.properties | cut -d "=" -f2)
+        elif [[ -f package.json ]]; then
+          version=$(jq < "${{github.workspace}}/package.json" .version | tr -d '"')
+        else
+          echo >&2 "Could not gradle.properties or package.json to retrieve version!"
+          exit 1
+        if
+
+        echo "version=${version}" >> $GITHUB_OUTPUT
+
     - name: create image tags
       id: create_image_tags
       shell: bash
       env:
-        REF_NAME: ${{inputs.refName}}
-        SEMVER: ${{inputs.semver}}
-        BUILD_NUMBER: ${{inputs.buildNumber}}
+        REF_NAME: ${{steps.get_ref.outputs.refName}}
+        SEMVER: ${{steps.get_version.outputs.version}}
+        BUILD_NUMBER: ${{github.run_number}}
         DEBUG: ${{inputs.debug}}
       run: |
         basename=$(echo "${{github.action_path}}" | xargs -I% basename %)
