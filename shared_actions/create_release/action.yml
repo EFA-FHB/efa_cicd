@@ -110,6 +110,16 @@ runs:
         debug: true
         force: true
 
+    - name: merge main into develop
+      shell: bash
+      run: |
+        git checkout main
+        git pull
+        git checkout development
+        git merge main
+        git commit -am"[github] catchup merge with main"
+
+
     - name: calculate new snapshot version
       id: snapshot_version
       env:
