@@ -6,7 +6,7 @@ Checks the passed `branchName` for compliance with the [project branching strate
 
 Name | Mandatory | Description | Default | Example
 -- | -- | -- | -- | --
-`branchName` | `yes` | Name of branch to check | | `feature/D603345-1104-github-actions-enforce-branching-strategy`, `${{github.ref_name}}`
+`refName` | `yes` | Name of branch to check | | `feature/D603345-1104-github-actions-enforce-branching-strategy`, `${{github.ref_name}}`
 `debug` | `no` | Whether to enable script debugging | `false` | 
 
 ## Outputs
@@ -20,7 +20,7 @@ Name | Description | Example
 <pre>
     - name: Project setup
       with:
-        branchName: ${{ github.ref_name }}
+        refName: ${{ github.ref_name }}
         debug: "true"
       uses: ./.github/actions/check_branch_name
 </pre>

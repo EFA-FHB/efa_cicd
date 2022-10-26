@@ -14,7 +14,7 @@ test() {
 
   local expected_result=
 
-  local BRANCH_NAME=
+  local REF_NAME=
 
   for args in $(echo "${@}" | tr ';' ' '); do {
    IFS="=" read -r -a arr <<< "${args}"
@@ -24,7 +24,7 @@ test() {
   local check="input: '$2'\n"
 
 
-  export BRANCH_NAME=${BRANCH_NAME}
+  export REF_NAME=${REF_NAME}
 
   local actual_result=
   actual_result=$(./check_branch_name.sh)
@@ -55,20 +55,25 @@ test() {
 
 main() {
 
-  test "expected_result=true" "BRANCH_NAME=main"
-  test "expected_result=true" "BRANCH_NAME=development"
-  test "expected_result=true" "BRANCH_NAME=feature/D603345-6-setup-shared-base-docker-images"
-  test "expected_result=true" "BRANCH_NAME=bugfix/D603345-6-setup-shared-base-docker-images"
-  test "expected_result=true" "BRANCH_NAME=hotfix/D603345-6_setup-shared-base-docker-images"
+  test "expected_result=true" "REF_NAME=main"
+  test "expected_result=true" "REF_NAME=development"
+  test "expected_result=true" "REF_NAME=feature/D603345-6-setup-shared-base-docker-images"
+  test "expected_result=true" "REF_NAME=bugfix/D603345-6-setup-shared-base-docker-images"
+  test "expected_result=true" "REF_NAME=hotfix/D603345-6_setup-shared-base-docker-images"
 
-  test "expected_result=false" "BRANCH_NAME=master"
-  test "expected_result=false" "BRANCH_NAME=main/foobar"
-  test "expected_result=false" "BRANCH_NAME=development/foobar"
-  test "expected_result=false" "BRANCH_NAME=feature/main"
-  test "expected_result=false" "BRANCH_NAME=hotfix/setup-shared-base-docker-images"
-  test "expected_result=false" "BRANCH_NAME=hotfix/[D603345-6]-setup-shared-base-docker-images"
-  test "expected_result=false" "BRANCH_NAME=hotfix/603345-6-setup-shared-base-docker-images"
-  test "expected_result=false" "BRANCH_NAME=hotfix/D603345-setup-shared-base-docker-images"
+  test "expected_result=false" "REF_NAME=master"
+  test "expected_result=false" "REF_NAME=main/foobar"
+  test "expected_result=false" "REF_NAME=development/foobar"
+  test "expected_result=false" "REF_NAME=feature/main"
+  test "expected_result=false" "REF_NAME=hotfix/setup-shared-base-docker-images"
+  test "expected_result=false" "REF_NAME=hotfix/[D603345-6]-setup-shared-base-docker-images"
+  test "expected_result=false" "REF_NAME=hotfix/603345-6-setup-shared-base-docker-images"
+  test "expected_result=false" "REF_NAME=hotfix/D603345-setup-shared-base-docker-images"
+
+  test "expected_result=true" "REF_NAME=v5.0.0"
+  test "expected_result=false" "REF_NAME=5.0.0"
+  test "expected_result=false" "REF_NAME=v5.0"
+  test "expected_result=false" "REF_NAME=v5"
 
 
   echo "passed=${passed};failed=${failed}"

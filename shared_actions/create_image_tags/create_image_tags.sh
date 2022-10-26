@@ -18,15 +18,15 @@ _create_tags() {
 
   local version_core=$(_extract_version_core)
 
-  if [[ ${BRANCH_NAME} == "main" ]]; then
+  if [[ ${REF_NAME} == "main" || ${REF_NAME} =~ ^v([0-9]+\.){2}[0-9]+ ]]; then
     tags+=("${version_core}-${BUILD_NUMBER}")
   fi
 
-  if [[ ${BRANCH_NAME} == "development" ]]; then
+  if [[ ${REF_NAME} == "development" ]]; then
     tags+=("${version_core}-beta-${BUILD_NUMBER} latest")
   fi
 
-  if [[ ${BRANCH_NAME} =~ ^(feature|hotfix|bugfix)/.+ ]]; then
+  if [[ ${REF_NAME} =~ ^(feature|hotfix|bugfix)/.+ ]]; then
     local issue_number=$(_extract_issue_number)
     local branch_prefix=$(_extract_branch_prefix)
 
@@ -45,7 +45,7 @@ _check_env_vars() {
   local errors=()
   [[ -z "${BUILD_NUMBER}" ]] && errors+=(BUILD_NUMBER)
   [[ -z "${SEMVER}" ]] && errors+=(SEMVER)
-  [[ -z "${BRANCH_NAME}" ]] && errors+=(BRANCH_NAME)
+  [[ -z "${REF_NAME}" ]] && errors+=(REF_NAME)
 
   [[ ${#errors} -gt 0 ]] && {
     echo >&2 -e "${RED}Missing required args: [${errors[*]}]${NC}"
@@ -76,11 +76,11 @@ _extract_version_core() {
 }
 
 _extract_issue_number() {
-  echo "${BRANCH_NAME}" | sed -E 's/^.+\/(D[0-9]+-[0-9]+).+$/\1/'
+  echo "${REF_NAME}" | sed -E 's/^.+\/(D[0-9]+-[0-9]+).+$/\1/'
 }
 
 _extract_branch_prefix() {
-  echo "${BRANCH_NAME}" | sed -E 's/^(feature|hotfix|bugfix)\/.+/\1/'
+  echo "${REF_NAME}" | sed -E 's/^(feature|hotfix|bugfix)\/.+/\1/'
 }
 
 main
