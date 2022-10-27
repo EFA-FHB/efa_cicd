@@ -45,26 +45,15 @@ runs:
           exit 1;
         fi
 
-    #- name: check semver
-    #  shell: bash
-    #  run: |
-    #    branch="${{ github.ref_name }}"
-    #    release_type="${{ inputs.release_type }}"
-    #
-    #    if [[ ! "${branch}" =~ ^(development|hotfix/.+)$ ]]; then
-    #      echo >&2 "Origin branch must be 'development' or a hotfix branch!"
-    #      exit 1;
-    #    fi
-    #
-    #    if [[ "${branch}" == development && "${release_type}" == "patch" ]]; then
-    #      echo >&2 "${release_type^} releases can only be triggered from a hotfix branch!"
-    #      exit 1;
-    #    fi
-    #
-    #    if [[ "${branch}" =~ ^hotfix/.+ && "${release_type}" != "patch" ]]; then
-    #      echo >&2 "${release_type^} releases can only be triggered from 'development'!"
-    #      exit 1;
-    #    fi
+    - name: check workflow origin
+      shell: bash
+      run: |
+        branch="${{ github.ref_name }}"
+
+        if [[ "${branch}" != "main" ]]; then
+            echo >&2 "Releases can only be triggered from the "main" branch!"
+            exit 1;
+        fi
 
     - name: import gpg
       id: import_gpg
@@ -191,11 +180,14 @@ runs:
       run: |
        echo "checkout development"
        git checkout development
+
        echo "get last commit"
        commit="$(git rev-parse HEAD)"
        echo "last commit is: $commit"
+
        echo "checkout main"
        git checkout main
+
        echo "pulling main"
        git pull || true
 
@@ -210,15 +202,9 @@ runs:
         git add gradle.properties && git commit -S -m "[github] catchup"
        fi
 
-       if [[ -z "$status" ]]; then
-          git reset --hard
-       fi
-
        echo "cherry-picking $commit"
-
        git cherry-pick -x "${commit}" || true
        echo "get status"
-
        status=$(git status --porcelain)
        echo "status is: $status"
 
