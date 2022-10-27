@@ -229,6 +229,6 @@ runs:
         USER_PASS: debug
 
     - name: Don't kill instace
-      if: ${{ steps.start_ngrok.outputs.state == 'true' }}
+      if: ${{ failure() && inputs.ngrokDebugEnable == 'true' }}
       shell: bash
       run: sleep 1h # Prevent to killing instance after failure
