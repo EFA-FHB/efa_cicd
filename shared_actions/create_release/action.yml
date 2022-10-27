@@ -45,26 +45,26 @@ runs:
           exit 1;
         fi
 
-    - name: check semver
-      shell: bash
-      run: |
-        branch="${{ github.ref_name }}"
-        release_type="${{ inputs.release_type }}"
-
-        if [[ ! "${branch}" =~ ^(development|hotfix/.+)$ ]]; then
-          echo >&2 "Origin branch must be 'development' or a hotfix branch!"
-          exit 1;
-        fi
-
-        if [[ "${branch}" == development && "${release_type}" == "patch" ]]; then
-          echo >&2 "${release_type^} releases can only be triggered from a hotfix branch!"
-          exit 1;
-        fi
-
-        if [[ "${branch}" =~ ^hotfix/.+ && "${release_type}" != "patch" ]]; then
-          echo >&2 "${release_type^} releases can only be triggered from 'development'!"
-          exit 1;
-        fi
+    #- name: check semver
+    #  shell: bash
+    #  run: |
+    #    branch="${{ github.ref_name }}"
+    #    release_type="${{ inputs.release_type }}"
+    #
+    #    if [[ ! "${branch}" =~ ^(development|hotfix/.+)$ ]]; then
+    #      echo >&2 "Origin branch must be 'development' or a hotfix branch!"
+    #      exit 1;
+    #    fi
+    #
+    #    if [[ "${branch}" == development && "${release_type}" == "patch" ]]; then
+    #      echo >&2 "${release_type^} releases can only be triggered from a hotfix branch!"
+    #      exit 1;
+    #    fi
+    #
+    #    if [[ "${branch}" =~ ^hotfix/.+ && "${release_type}" != "patch" ]]; then
+    #      echo >&2 "${release_type^} releases can only be triggered from 'development'!"
+    #      exit 1;
+    #    fi
 
     - name: import gpg
       id: import_gpg
@@ -136,7 +136,6 @@ runs:
       run: |
         git checkout development
         git pull
-        git pull origin main --rebase
 
     - name: calculate new snapshot version
       id: snapshot_version
@@ -171,7 +170,7 @@ runs:
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
 
-        git commit -S -m "[github] update SNAPSHOT-version to ${{ env.snapshotVersion }}" -- gradle.properties 2> /dev/null
+        git commit -S -m "[github] update SNAPSHOT-version to ${{ env.snapshotVersion }}" -- gradle.properties
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
