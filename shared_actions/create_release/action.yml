@@ -91,7 +91,7 @@ runs:
 
         IFS="." read -r -a cv <<<"${curr_version}"
         IFS="." read -r -a nv <<<"${new_version}"
-        if [[ "${cv[0]}" -gt "${nv[0]}" || "${cv[1]}" -gt "${nv[1]}" || "${cv[2]}" -gt "${nv[2]}" ]];
+        if [[ "${cv[0]}" -gt "${nv[0]}" || "${cv[1]}" -gt "${nv[1]}" || "${cv[2]}" -gt "${nv[2]}" ]]; then
           echo >&2 "New version has lower preference than current version!"
           echo >&2 "It should be the other way around. Maybe you forgot to catchup with main first?"
           exit 1;
