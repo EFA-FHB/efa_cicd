@@ -40,7 +40,7 @@ runs:
           echo >&2 "Could not gradle.properties or package.json to retrieve version!"
           exit 1
         if
-
+        
         echo "version=${version}" >> $GITHUB_OUTPUT
 
     - name: create image tags
