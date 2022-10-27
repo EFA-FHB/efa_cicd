@@ -129,12 +129,7 @@ runs:
         debug: true
         force: true
 
-    - name: hotfix - remove branch
-      if: startsWith(github.ref_name, 'hotfix/')
-      shell: bash
-      run: |
-        echo "Deleting hotfix branch ${{ github.ref_name }}"
-        git push -d origin ${{ github.ref_name }}
+
 #    - name: Start SSH via Ngrok
 #      shell: bash
 #      run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
@@ -150,12 +145,6 @@ runs:
 #    - name: Don't kill instace
 #      shell: bash
 #      run: sleep 1h # Prevent to killing instance after failure
-
-    - name: catchup main => development
-      shell: bash
-      run: |
-        git checkout development
-        git pull origin main
 
     - name: calculate new snapshot version
       id: snapshot_version
@@ -195,6 +184,19 @@ runs:
       uses: CasperWA/push-protected@v2.10.0
       with:
         token: ${{ inputs.token }}
+        branch: "main"
+        debug: true
+
+    - name: catchup main => development
+      shell: bash
+      run: |
+        git checkout development
+        git pull origin main
+
+    - name: git push
+      uses: CasperWA/push-protected@v2.10.0
+      with:
+        token: ${{ inputs.token }}
         branch: "development"
         debug: true
 
@@ -222,3 +224,10 @@ runs:
         name: ${{inputs.name}}
         body: ${{steps.github_release.outputs.changelog}}
         tag_name: ${{steps.tag.outputs.new_tag}}
+
+    - name: hotfix - remove branch
+      if: startsWith(github.ref_name, 'hotfix/')
+      shell: bash
+      run: |
+        echo "Deleting hotfix branch ${{ github.ref_name }}"
+        git push -d origin ${{ github.ref_name }} &> /dev/null
