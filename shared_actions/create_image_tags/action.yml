@@ -1,13 +1,7 @@
 name: create_image_tag_names
-description: "Create image tags based on branch name input"
+description: "Create image tags based on branch name and version"
 
 inputs:
-  buildNumber:
-    description: "Number of the build run"
-    required: true
-  semver:
-    description: "String in semantic versioning format"
-    required: true
   debug:
     description: "Whether to debug the script"
     required: false
@@ -25,13 +19,13 @@ runs:
       id: get_ref
       shell: bash
       run: |
-        ref_name=${{ github.ref_name }}
-        head_ref=${{ github.head_ref }}
-        if [[ "${ref_name}" =~ merge/$ ]]; then
-          echo "refName=${head_ref}" >> $GITHUB_OUTPUT
+        refName=
+        if [[ "${{github.event_name}}" == 'push' ]]; then
+          refName="${{ github.ref_name }}"
         else
-          echo "refName=${ref_name}" >> $GITHUB_OUTPUT
+          refName="${{ github.head_ref }}"
         fi
+        echo "refName=${refName}" >> $GITHUB_OUTPUT
 
     - name: current version
       id: get_version
