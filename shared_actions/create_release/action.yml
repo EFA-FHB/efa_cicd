@@ -190,9 +190,9 @@ runs:
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
        git checkout development
-       commit-id=$(git rev-parse HEAD)
+       commit=$(git rev-parse HEAD)
        git checkout main
-       git cherry-pick -x $commit-id || true
+       git cherry-pick -x $commit || true
 
        count=$(sed -n '/<<</,/===/p' gradle.properties | wc -l)
 
