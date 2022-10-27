@@ -33,9 +33,14 @@ none
 Building image with additonal tags
 
 <pre>
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          
       - name: run tests
         id: run_tests
-        uses: ./.github/actions/gradle_xray_test
+        uses: ./.github/actions/shared/gradle_xray_test
         with:
           app: vergabesystem-adapter
           xray-send-reports-to-jira: ${{ github.ref == 'refs/heads/main' }}

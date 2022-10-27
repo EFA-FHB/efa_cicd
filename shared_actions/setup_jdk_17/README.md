@@ -11,8 +11,13 @@ none
 ##Usage
 
 <pre>
-    - name: Project setup
-      uses: ./.github/actions/setup_jdk_17
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+
+      - name: Project setup
+        uses: ./.github/actions/shared/setup_jdk_17
 </pre>
 
 

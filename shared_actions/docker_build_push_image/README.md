@@ -27,9 +27,14 @@ Name | Description | Example
 **Build and tag image with 'latest'**
 
 <pre>
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          
       - name: docker build image
         id: build_image
-        uses: ./.github/actions/docker_build_image
+        uses: ./.github/actions/shared/docker_build_push_image
         with:
           image: ${{env.AZURE_DOCKER_REGISTRY}}/bkms-mediator-app
           imageTags: "latest"
@@ -39,10 +44,15 @@ Name | Description | Example
 
 **Build and tag image (without security scan)**
 
-<pre>
+<pre>  
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          
       - name: docker build image
         id: build_image
-        uses: ./.github/actions/docker_build_image
+        uses: ./.github/actions/docker_build_push_image
         with:
           image: ${{env.AZURE_DOCKER_REGISTRY}}/bkms-mediator-app
           imageTags: "latest"
@@ -54,9 +64,14 @@ Name | Description | Example
 **Build and tag image (without 'docker push')**
 
 <pre>
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+          
       - name: docker build image
         id: build_image
-        uses: ./.github/actions/docker_build_image
+        uses: ./.github/actions/docker_build_push_image
         with:
           image: ${{env.AZURE_DOCKER_REGISTRY}}/bkms-mediator-app
           imageTags: "latest"

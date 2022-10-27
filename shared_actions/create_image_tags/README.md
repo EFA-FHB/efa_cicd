@@ -26,7 +26,7 @@ Name | Description | Example
 <pre>
       - name: create image tags
         id: create_image_tags
-        uses: ./.github/actions/create_image_tags
+        uses: ./.github/actions/shared/create_image_tags
 </pre>
 
 

@@ -47,7 +47,7 @@ jobs:
           tag: v1.3.0
       
       - name: login to AKS
-        uses: ./.github/actions/azure_k8s_sp_login
+        uses: ./.github/actions/shared/azure_k8s_sp_login
         with: 
            az_sp_credentials: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CREDENTIALS }}
            az_sp_client_id: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CLIENT_ID }}

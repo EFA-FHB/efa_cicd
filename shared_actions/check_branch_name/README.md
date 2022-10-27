@@ -17,7 +17,7 @@ Name | Mandatory | Description | Default | Example
     - name: Project setup
       with:
         debug: "true"
-      uses: ./.github/actions/check_branch_name
+      uses: ./.github/actions/shared/check_branch_name
 </pre>
 
 

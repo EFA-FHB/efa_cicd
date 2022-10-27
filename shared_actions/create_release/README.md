@@ -63,7 +63,7 @@ jobs:
           token: ${{secrets.REPO_ACCESS_TOKEN}}
 
       - name: create_release
-        uses: ./.github/actions/create_release
+        uses: ./.github/actions/shared/create_release
         with:
           gpg_private_key: ${{secrets.BOT_GPG_PRIVATE_KEY}}
           gpg_passphrase: ${{secrets.BOT_GPG_PASSPHRASE}}

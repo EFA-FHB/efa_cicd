@@ -1,4 +1,5 @@
-## trigger_deploy_workflow
+## trigger_deploy_workflow  (Deprecated)
+***This action is deprecated and will no longer be maintained***
 
 This action triggers a deployment workflow located in [k8s_workflows](https://github.com/EFA-FHB/k8s_workflows). 
 
@@ -24,9 +25,15 @@ Name of workflow to trigger.
 ## Usage
 
 <pre>
+
+      - name: install_shared_actions
+        uses: ./.github/actions/install_shared_actions
+        with:
+          token: ${{secrets.REPO_ACCESS_TOKEN}}
+
       - name: trigger deployment
         id: trigger_deployment
-        uses: ./.github/actions/trigger_deploy_workflow
+        uses: ./.github/actions/shared/trigger_deploy_workflow
         with:
           tag: '2.0.0'
           tag-file-name: 'pushed_tags.txt'
