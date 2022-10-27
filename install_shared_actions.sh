@@ -29,6 +29,10 @@ function main() {
     ACTIONS_TARGET_DIR="${ACTIONS_TARGET_DIR}/actions"
   }
 
+  [[ ! "${ACTIONS_TARGET_DIR}" =~ shared$ ]] && {
+    ACTIONS_TARGET_DIR="${ACTIONS_TARGET_DIR}/shared"
+  }
+
   mkdir -p "${ACTIONS_TARGET_DIR}"
 
   cd $(dirname "$0")
