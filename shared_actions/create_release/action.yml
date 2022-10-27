@@ -150,6 +150,7 @@ runs:
       shell: bash
       run: |
         git checkout development
+        git pull
         git pull origin main
 
     - name: calculate new snapshot version
@@ -185,7 +186,7 @@ runs:
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
 
-        git commit -S -m "[github] update SNAPSHOT-version to ${{ env.snapshotVersion }}" -- gradle.properties 2> /dev/null || true
+        git commit -S -m "[github] update SNAPSHOT-version to ${{ env.snapshotVersion }}" -- gradle.properties 2> /dev/null
 
     - name: git push
       uses: CasperWA/push-protected@v2.10.0
