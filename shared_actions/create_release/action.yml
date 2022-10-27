@@ -192,22 +192,26 @@ runs:
        git checkout development
        commit="$(git rev-parse HEAD)"
        git checkout main
+       git pull || true
+
+       status=$(git status --porcelain)
+
+       if [[ "$status" == "UU gradle.properties" ]]; then
+        echo "conflict after pull!"
+        sed -i '/<<</,/===/d' gradle.properties
+        sed -i '/>>>/d' gradle.properties
+        git add gradle.properties && git commit -S -m "[github] catchup"
+       fi
+
+
        git cherry-pick -x "${commit}" || true
+       status=$(git status --porcelain)
 
-       count=$(sed -n '/<<</,/===/p' gradle.properties | wc -l)
-
-       echo "found conflicting lines : $count"
-
-       if [[ $count -eq 3 ]]; then
-          echo "trying to resolve conflicts"
-          cat gradle.properties
-          sed -i '/<<</,/===/d' gradle.properties
-          sed -i '/>>>/d' gradle.properties
-          count=$(sed -n '/<<</,/===/p' gradle.properties | wc -l)
-          if [[ $count -eq 0 ]]; then
-            echo "conflicts resolved"
-            git commit -S -m "[github] cherry-picking SNAPSHOT-version update" -- gradle.properties
-          fi
+       if [[ "$status" == "UU gradle.properties" ]]; then
+        echo "conflict after cherry-pick!"
+        sed -i '/<<</,/===/d' gradle.properties
+        sed -i '/>>>/d' gradle.properties
+        git add gradle.properties && git commit -S -m "[github] cherry-pick SNAPSHOT commit $commit"
        fi
 
     - name: git push
