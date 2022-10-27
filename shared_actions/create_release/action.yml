@@ -93,7 +93,7 @@ runs:
         curr_number=$(tr -d '.' <<< $curr_version)
         new_number=$(tr -d '.' <<< $new_version)
 
-        if [[ ! $new_number -gt $curr_number ]]; then
+        if [[ ! $new_number -gte $curr_number ]]; then
           echo >&2 "New version ${new_version} has lower preference than current version ${orig_version}!"
           echo >&2 "It should be the other way around. Maybe you forgot to catchup with main first?"
           exit 1;
@@ -196,7 +196,6 @@ runs:
       with:
         token: ${{ inputs.token }}
         branch: "development"
-#        tags: true
         debug: true
 
     - name: changelog config template
