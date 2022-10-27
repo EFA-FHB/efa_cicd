@@ -39,8 +39,8 @@ runs:
         else
           echo >&2 "Could not gradle.properties or package.json to retrieve version!"
           exit 1
-        if
-        
+        fi
+
         echo "version=${version}" >> $GITHUB_OUTPUT
 
     - name: create image tags
