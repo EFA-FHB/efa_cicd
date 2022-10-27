@@ -149,6 +149,7 @@ runs:
     - name: catchup main => development
       shell: bash
       run: |
+        git config pull.ff only
         git checkout development
         git pull
         git pull origin main
