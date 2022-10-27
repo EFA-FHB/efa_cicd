@@ -189,12 +189,19 @@ runs:
         GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
         GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
       run: |
+       echo "checkout development"
        git checkout development
+       echo "get last commit"
        commit="$(git rev-parse HEAD)"
+       echo "last commit is: $commit"
+       echo "checkout main"
        git checkout main
+       echo "pulling main"
        git pull || true
 
+       echo "get status"
        status=$(git status --porcelain)
+       echo "status is: $status"
 
        if [[ "$status" == "UU gradle.properties" ]]; then
         echo "conflict after pull!"
@@ -203,9 +210,13 @@ runs:
         git add gradle.properties && git commit -S -m "[github] catchup"
        fi
 
+       echo "cherry-picking $commit"
 
        git cherry-pick -x "${commit}" || true
+       echo "get status"
+
        status=$(git status --porcelain)
+       echo "status is: $status"
 
        if [[ "$status" == "UU gradle.properties" ]]; then
         echo "conflict after cherry-pick!"
