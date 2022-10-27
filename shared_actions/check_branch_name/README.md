@@ -9,7 +9,8 @@ Name | Mandatory | Description | Default | Example
 -- | -- | -- | -- | --
 `debug` | `no` | Whether to enable script debugging | `false` | 
 
-
+## Outputs
+**none**
 
 ##Usage
 
