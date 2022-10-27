@@ -203,11 +203,15 @@ runs:
        status=$(git status --porcelain)
        echo "status is: $status"
 
-       if [[ "$status" == "UU gradle.properties" ]]; then
+       if [[ "$status" =~ gradle.properties ]]; then
         echo "conflict after pull!"
         sed -i '/<<</,/===/d' gradle.properties
         sed -i '/>>>/d' gradle.properties
         git add gradle.properties && git commit -S -m "[github] catchup"
+       fi
+
+       if [[ -z "$status" ]]; then
+          git reset --hard
        fi
 
        echo "cherry-picking $commit"
