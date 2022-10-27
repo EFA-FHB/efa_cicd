@@ -20,7 +20,7 @@ runs:
       shell: bash
       run: |
         refName=
-        if [[ "${{github.event_name}}" == 'push' ]]; then
+        if [[ "${{github.event_name}}" == "push" ]]; then
           refName="${{ github.ref_name }}"
         else
           refName="${{ github.head_ref }}"
