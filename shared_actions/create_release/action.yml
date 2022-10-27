@@ -146,6 +146,12 @@ runs:
 #      shell: bash
 #      run: sleep 1h # Prevent to killing instance after failure
 
+    - name: pull latest changes => main
+      shell: bash
+      run: |
+        git checkout main
+        git pull
+
     - name: calculate new snapshot version
       id: snapshot_version
       env:
@@ -158,6 +164,7 @@ runs:
         idx=${idxs[${{env.release_type}}]}
         parts[$idx]=$((${parts[$idx]}+1))
         version="$(echo ${parts[*]} | tr ' ' '.')-SNAPSHOT"
+
         echo "::set-output name=value::${version}"
 
     - name: update gradle.properties
@@ -166,6 +173,7 @@ runs:
       shell: bash
       run: |
         sed -i -E "s/(version=).*/\1${{env.snapshotVersion}}/" gradle.properties
+
 
     - name: commit SNAPSHOT version
       shell: bash
