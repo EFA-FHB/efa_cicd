@@ -57,7 +57,6 @@ _check_env_vars() {
 }
 
 _check_semver() {
-
   local version_core=$(_extract_version_core)
 
   if [[ "${version_core}" =~ ^([0-9]+\.){2}[0-9]+$ ]]; then
@@ -72,7 +71,7 @@ _check_semver() {
 }
 
 _extract_version_core() {
-  echo "${SEMVER}" | sed -E 's/^([^.]+\.[^.]+\.[^-+]+).+/\1/'
+  echo "${SEMVER}" | sed -E 's/^([^.]+\.[^.]+\.[^-+]+).*/\1/'
 }
 
 _extract_issue_number() {
