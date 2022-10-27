@@ -35,7 +35,7 @@ runs:
         if [[ -f gradle.properties ]]; then
           version=$(grep -E "version" gradle.properties | cut -d "=" -f2)
         elif [[ -f package.json ]]; then
-          version=$(jq < "${{github.workspace}}/package.json" .version | tr -d '"')
+          version=$(jq < package.json .version | tr -d '"')
         else
           echo >&2 "Could not gradle.properties or package.json to retrieve version!"
           exit 1
