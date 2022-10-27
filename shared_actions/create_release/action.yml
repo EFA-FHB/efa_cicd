@@ -151,11 +151,11 @@ runs:
 #      shell: bash
 #      run: sleep 1h # Prevent to killing instance after failure
 
-#    - name: catchup main => development
-#      shell: bash
-#      run: |
-#        git checkout development
-#        git pull origin main
+    - name: catchup main => development
+      shell: bash
+      run: |
+        git checkout development
+        git pull origin main
 
     - name: calculate new snapshot version
       id: snapshot_version
