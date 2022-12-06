@@ -84,6 +84,7 @@ main() {
   test "expected_result=1.2.3-hotfix-D603345-6-42%%1.2.3-hotfix-D603345-6-latest" "REF_NAME=hotfix/D603345-6-setup-shared-base-docker-images;BUILD_NUMBER=42;SEMVER=1.2.3"
 
   test "expected_result=6.11.11-42" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=6.11.11"
+  test "expected_result=6.11.11-rc-42%%6.11.11-rc-latest" "REF_NAME=release/milestone-4;BUILD_NUMBER=42;SEMVER=6.11.11"
 
 
   echo "passed=${passed};failed=${failed}"

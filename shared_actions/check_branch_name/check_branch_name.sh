@@ -11,6 +11,8 @@ main() {
     exit 0
   elif [[ "${REF_NAME}" =~ ^(main|development)$ ]]; then
     exit 0
+  elif [[ "${REF_NAME}" =~ ^release/.+$ ]]; then
+    exit 0
   elif [[ "${REF_NAME}" =~ ^(feature|hotfix|bugfix)/D[0-9]+-[0-9]+[-_].+ ]]; then
     exit 0
   fi

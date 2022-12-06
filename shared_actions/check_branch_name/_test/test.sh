@@ -55,7 +55,10 @@ main() {
   test "expected_exit=0" "REF_NAME=feature/D603345-6-setup-shared-base-docker-images"
   test "expected_exit=0" "REF_NAME=bugfix/D603345-6-setup-shared-base-docker-images"
   test "expected_exit=0" "REF_NAME=hotfix/D603345-6_setup-shared-base-docker-images"
+  test "expected_exit=0" "REF_NAME=release/milestone-4"
 
+  test "expected_exit=1" "REF_NAME=release"
+  test "expected_exit=1" "REF_NAME=release/"
   test "expected_exit=1" "REF_NAME=master"
   test "expected_exit=1" "REF_NAME=main/foobar"
   test "expected_exit=1" "REF_NAME=development/foobar"

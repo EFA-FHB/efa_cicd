@@ -26,6 +26,12 @@ _create_tags() {
     tags+=("${version_core}-beta-${BUILD_NUMBER} latest")
   fi
 
+  if [[ ${REF_NAME} =~ ^release/.+ ]]; then
+    for suffix in ${BUILD_NUMBER} latest; do {
+      tags+=("${version_core}-rc-${suffix}")
+    } done
+  fi
+
   if [[ ${REF_NAME} =~ ^(feature|hotfix|bugfix)/.+ ]]; then
     local issue_number=$(_extract_issue_number)
     local branch_prefix=$(_extract_branch_prefix)
