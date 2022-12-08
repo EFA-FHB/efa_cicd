@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      repos: ${{ steps.get_repos.outputs.matrix }}
+      repos: ${{ steps.get_repos.outputs.repos }}
 
     steps:
 
@@ -38,12 +38,23 @@ jobs:
         shell: bash
         run: |
           repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -o tsv)
-          json=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}')
-          json='${{ toJSON($json) }}'
+          json=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}' | jq '@json')
           echo "repos=${json}" >> $GITHUB_OUTPUT
 
-  cleanup:
+  debug:
 
+    needs: [get_repos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: debug
+        shell: bash
+        env:
+          JSON: ${{ toJSON(needs.get_repos.outputs.repos) }}
+        run: echo $JSON
+
+
+  cleanup:
+    if: false
     needs: [get_repos]
 
     runs-on: ubuntu-latest
