@@ -88,5 +88,5 @@ jobs:
             echo "Deleting tag ${tag}"
             az acr repository delete --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
               --image ${{matrix.repo}}:$tag \
-              --yes
+              --yes || true
           } done < to_delete.tags
