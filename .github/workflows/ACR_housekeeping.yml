@@ -38,7 +38,7 @@ jobs:
         id: get_repos
         shell: bash
         run: |
-          echo "repos=$(az acr repository list --name --name ${{env.AZURE_ACR_RESOURCE_NAME}} -ojson | tr '\n' ' ' | tr -d ' ')" >> $GITHUB_OUTPUT
+          echo "repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -ojson | tr '\n' ' ' | tr -d ' ')" >> $GITHUB_OUTPUT
 
   debug:
 
