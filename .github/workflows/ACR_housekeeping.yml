@@ -1,6 +1,6 @@
 # This workflow deletes outdated images from the Azure Container Registry (ACR)
 #
-name: "ACR_housekeeping"
+name: "🧹 ACR_housekeeping"
 
 on:
   workflow_dispatch:
