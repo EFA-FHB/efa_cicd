@@ -38,9 +38,9 @@ jobs:
         shell: bash
         run: |
           repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -o tsv)
-          json=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}' | jq '@json')
+          json=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}')
+          json='${{ toJSON(json) }}'
           echo "repos=${json}" >> $GITHUB_OUTPUT
-
 
   cleanup:
 
@@ -50,7 +50,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        repo: ${{ fromJson(needs.get_repos.outputs.repos).repos }}
+        repo: ${{ fromJson(needs.get_repos.outputs.repos) }}
 
     name: "clean ${{matrix.repo}}"
 
