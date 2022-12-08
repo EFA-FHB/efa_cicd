@@ -40,20 +40,7 @@ jobs:
         run: |
           echo "repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -ojson | tr '\n' ' ' | tr -d ' ')" >> $GITHUB_OUTPUT
 
-  debug:
-
-    needs: [get_repos]
-    runs-on: ubuntu-latest
-    steps:
-      - name: debug
-        shell: bash
-        env:
-          JSON: ${{ toJSON(needs.get_repos.outputs.repos) }}
-        run: echo $JSON
-
-
   cleanup:
-    if: false
     needs: [get_repos]
 
     runs-on: ubuntu-latest
