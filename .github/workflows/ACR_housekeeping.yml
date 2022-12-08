@@ -35,6 +35,7 @@ jobs:
           az account set -n ${{env.AZURE_SUBSCRIPTION_NAME}}
 
       - name: get repos
+        id: get_repos
         shell: bash
         run: |
           repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -o tsv)
