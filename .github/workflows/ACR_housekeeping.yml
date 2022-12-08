@@ -62,11 +62,11 @@ jobs:
         run: |
           az account set -n ${{env.AZURE_SUBSCRIPTION_NAME}}
 
-      - name: fetch tags for {{matrix.repo}}
+      - name: fetch tags for ${{matrix.repo}}
         shell: bash
         run: |
           az acr repository show-tags --name ${{env.AZURE_ACR_RESOURCE_NAME}}
-            --repository {{matrix.repo}} \
+            --repository ${{matrix.repo}} \
             --orderby time_desc -o tsv > repo.tags
 
           tag_count=$(cat repo.tags | wc -l)
