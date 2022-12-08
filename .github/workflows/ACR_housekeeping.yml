@@ -39,8 +39,8 @@ jobs:
         shell: bash
         run: |
           repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -o tsv)
-          json=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}' | jq '@json')
-          echo "repos=${json}" >> $GITHUB_OUTPUT
+          out=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}')
+          echo "repos=${out}" >> $GITHUB_OUTPUT
 
   debug:
 
