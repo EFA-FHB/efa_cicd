@@ -17,8 +17,45 @@ env:
 
 jobs:
 
-  get_repos:
+  get_usage:
     runs-on: ubuntu-latest
+
+    outputs:
+      cleanup_required: ${{ steps.calculate_usage.outputs.cleanup_required }}
+
+    steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CREDENTIALS  }}
+
+    - name: set subscription
+      shell: bash
+      run: |
+        az account set -n ${{env.AZURE_SUBSCRIPTION_NAME}}
+
+    - name: calculate usage
+      id: calculate_usage
+      shell: bash
+      run: |
+        az acr show-usage --name ${{env.AZURE_ACR_RESOURCE_NAME}} | jq --arg metric "Size" '.value | .[] | select(.name == $metric)' > usage.json
+        curr=$(jq < usage.json '.currentValue')
+        limit=$(jq < usage.json '.limit')
+        max_allowed=$(($limit/100 * 90))
+
+        if [[ "${curr}" -gt "${max_allowed}" ]]; then
+          echo "cleanup_required=true" >> $GITHUB_OUTPUT
+        else
+          echo "cleanup_required=false" >> $GITHUB_OUTPUT
+        fi
+
+
+  get_repos:
+
+    needs: [get_usage]
+
+    runs-on: ubuntu-latest
+
+    if: ${{ needs.get_usage.outputs.cleanup_required == 'true' }}
 
     outputs:
       repos: ${{ steps.get_repos.outputs.repos }}
