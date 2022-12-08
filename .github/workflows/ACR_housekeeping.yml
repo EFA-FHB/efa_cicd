@@ -65,7 +65,7 @@ jobs:
       - name: fetch tags for ${{matrix.repo}}
         shell: bash
         run: |
-          az acr repository show-tags --name ${{env.AZURE_ACR_RESOURCE_NAME}}
+          az acr repository show-tags --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
             --repository ${{matrix.repo}} \
             --orderby time_desc -o tsv > repo.tags
 
