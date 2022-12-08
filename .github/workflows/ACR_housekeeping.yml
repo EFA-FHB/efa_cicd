@@ -37,8 +37,9 @@ jobs:
       - name: get repos
         shell: bash
         run: |
-          repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -o json)
-          echo "repos=${repos}" >> $GITHUB_OUTPUT
+          repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -o tsv)
+          repos=$(jq -n --arg repos "${repos}" '{repos: $repos |split("\n")}')
+          echo "repos=${{ toJSON($repos) }}" >> $GITHUB_OUTPUT
 
 
   cleanup:
