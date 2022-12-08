@@ -1,0 +1,50 @@
+# This workflow deletes outdated images from the Azure Container Registry (ACR)
+#
+name: "ACR_housekeeping"
+
+on:
+  workflow_dispatch:
+
+  #schedule:
+  #  - cron: "0 0 * * *"
+
+concurrency:
+  group: ACR_housekeeping
+
+env:
+  AZURE_SUBSCRIPTION_NAME: Pay-As-You-Go-eVergabe-EFA-FHB
+  AZURE_ACR_RESOURCE_NAME: efafhb
+
+jobs:
+
+  cleanup:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+   # strategy:
+   #   matrix:
+   #     repo:
+   #       - bkms-mediator
+   #       - vergabesystem-adapter
+   #       - k8s_workflows
+   #       - bkms-mock-server
+   #       - ai-vergabeplattform-mock
+   #       - efa_cicd
+
+    name: "clean"
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CREDENTIALS  }}
+
+      - name: set subscription
+        shell: bash
+        run: |
+          az account set -n ${{env.AZURE_SUBSCRIPTION_NAME}}
+
+      - name: get repos
+        shell: bash
+        run: |
+          az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}}
