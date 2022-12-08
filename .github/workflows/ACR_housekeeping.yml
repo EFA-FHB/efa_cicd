@@ -1,12 +1,12 @@
 # This workflow deletes outdated images from the Azure Container Registry (ACR)
 #
-name: "ACR_housekeeping"
+name: "🧹 ACR_housekeeping"
 
 on:
   workflow_dispatch:
 
-  #schedule:
-  #  - cron: "0 0 * * *"
+  schedule:
+    - cron: "0 0 * * *"
 
 concurrency:
   group: ACR_housekeeping
@@ -17,23 +17,14 @@ env:
 
 jobs:
 
-  cleanup:
+  get_repos:
+
     runs-on: ubuntu-latest
-    continue-on-error: true
-   # strategy:
-   #   matrix:
-   #     repo:
-   #       - bkms-mediator
-   #       - vergabesystem-adapter
-   #       - k8s_workflows
-   #       - bkms-mock-server
-   #       - ai-vergabeplattform-mock
-   #       - efa_cicd
 
-    name: "clean"
+    outputs:
+      repos: ${{ steps.get_repos.outputs.repos }}
+
     steps:
-
-      - uses: actions/checkout@v3
 
       - uses: azure/login@v1
         with:
@@ -45,6 +36,58 @@ jobs:
           az account set -n ${{env.AZURE_SUBSCRIPTION_NAME}}
 
       - name: get repos
+        id: get_repos
         shell: bash
         run: |
-          az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}}
+          echo "repos=$(az acr repository list --name ${{env.AZURE_ACR_RESOURCE_NAME}} -ojson | tr '\n' ' ' | tr -d ' ')" >> $GITHUB_OUTPUT
+
+  cleanup:
+    needs: [get_repos]
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        repo: ${{ fromJson(needs.get_repos.outputs.repos) }}
+
+    name: "clean ${{matrix.repo}}"
+
+    steps:
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CREDENTIALS  }}
+
+      - name: set subscription
+        shell: bash
+        run: |
+          az account set -n ${{env.AZURE_SUBSCRIPTION_NAME}}
+
+      - name: fetch tags for ${{matrix.repo}}
+        shell: bash
+        run: |
+          az acr repository show-tags --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
+            --repository ${{matrix.repo}} \
+            --orderby time_desc -o tsv > repo.tags
+
+          tag_count=$(cat repo.tags | wc -l)
+          echo "Got ${tag_count} tags for repo ${{matrix.repo}}"
+
+      - name: delete tags
+        shell: bash
+        run: |
+          awk 'NR > 100 {print}' < repo.tags > to_delete.tags
+
+          if [[ $(cat to_delete.tags | wc -l) -eq 0 ]]; then
+            echo "No tags to delete"
+            exit 0
+          fi
+
+          echo "Will start deleting $(cat to_delete.tags | wc -l) tags for repo ${{matrix.repo}}"
+
+          while read tag; do {
+            echo "Deleting tag ${tag}"
+            az acr repository delete --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
+              --image ${{matrix.repo}}:$tag \
+              --yes || true
+          } done < to_delete.tags
