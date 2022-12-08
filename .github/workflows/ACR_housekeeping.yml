@@ -50,7 +50,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        repo: ${{ fromJson(needs.get_repos.outputs.repos) }}
+        repo: ${{ fromJson(needs.get_repos.outputs.repos).repos }}
 
     name: "clean ${{matrix.repo}}"
 
