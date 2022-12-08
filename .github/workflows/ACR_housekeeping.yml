@@ -19,8 +19,6 @@ jobs:
 
   get_repos:
 
-    needs: [get_usage]
-
     runs-on: ubuntu-latest
 
     if: ${{ needs.get_usage.outputs.cleanup_required == 'true' }}
