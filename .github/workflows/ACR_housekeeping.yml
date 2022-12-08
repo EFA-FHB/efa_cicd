@@ -21,8 +21,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    if: ${{ needs.get_usage.outputs.cleanup_required == 'true' }}
-
     outputs:
       repos: ${{ steps.get_repos.outputs.repos }}
 
