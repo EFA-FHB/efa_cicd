@@ -49,7 +49,7 @@ runs:
           tag_file=$(find . -type f -name "${{inputs.tag-file-name}}" | head -1)
           tag=$(cat $tag_file | head -1)
         fi
-        echo "::set-output name=value::$tag"
+        echo "value=${$tag}" >> $GITHUB_OUTPUT
 
     - name: trigger deployment ${{ steps.get_tag.outputs.value }}
       if: ${{ steps.get_tag.outputs.value != '' }}

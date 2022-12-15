@@ -139,7 +139,7 @@ runs:
         parts[$idx]=$((${parts[$idx]}+1))
         version="$(echo ${parts[*]} | tr ' ' '.')-SNAPSHOT"
 
-        echo "::set-output name=value::${version}"
+        echo "value=${version}" >> $GITHUB_OUTPUT
 
     - name: update gradle.properties
       env:
@@ -230,7 +230,7 @@ runs:
       run: |
         config_path=$(find . -name "changelog-config.json" | head -1)
         echo $config_path
-        echo "::set-output name=value::${config_path}"
+        echo "value=${config_path}" >> $GITHUB_OUTPUT
 
     - name: Build Changelog
       id: github_release
