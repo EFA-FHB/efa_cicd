@@ -53,8 +53,8 @@ runs:
         SEMVER: ${{steps.get_version.outputs.version}}
         BUILD_NUMBER: ${{github.run_number}}
       run:
-        tags="${{env.SEMVER}}-beta-${{env.BUILD_NUMBER}} latest"
-        echo "tags=${tags}" >> $GITHUB_OUTPUT
+        echo "tags=${{env.SEMVER}}-beta-${{env.BUILD_NUMBER}} latest" >> $GITHUB_OUTPUT
+
     - name: debug
       shell: bash
       env:
