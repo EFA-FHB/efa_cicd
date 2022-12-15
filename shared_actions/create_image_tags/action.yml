@@ -56,6 +56,7 @@ runs:
         tags="${{env.SEMVER}}-beta-${{env.BUILD_NUMBER}} latest"
         echo "tags=${tags}" >> $GITHUB_OUTPUT
     - name: debug
+      shell: bash
       env:
         dependabot_tags: ${{steps.create_image_tags_dependabot.outputs.tags }}
       run: echo ${{env.dependabot_tags}}
