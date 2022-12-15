@@ -9,7 +9,9 @@ inputs:
 outputs:
   tags:
     description: "Space separated list of image tags"
-    value: ${{steps.dependabot.outputs.tags || steps.create_image_tags.outputs.tags}}
+#    value: ${{steps.dependabot.outputs.tags || steps.create_image_tags.outputs.tags}}
+    value: ${{steps.dependabot.outputs.tags}}
+
 runs:
   using: "composite"
 
