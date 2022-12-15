@@ -9,8 +9,7 @@ inputs:
 outputs:
   tags:
     description: "Space separated list of image tags"
-#    value: ${{steps.dependabot.outputs.tags || steps.create_image_tags.outputs.tags}}
-    value: ${{ steps.create_image_tags_dependabot.outputs.tags }}
+    value: ${{steps.dependabot.outputs.tags || steps.create_image_tags.outputs.tags}}
 
 runs:
   using: "composite"
@@ -46,20 +45,14 @@ runs:
         echo "version=${version}" >> $GITHUB_OUTPUT
 
     - name: dependabot
-      id: create_image_tags_dependabot
+      id: dependabot
       if: ${{startsWith(steps.get_ref.outputs.refName, 'dependabot')}}
       shell: bash
       env:
         SEMVER: ${{steps.get_version.outputs.version}}
         BUILD_NUMBER: ${{github.run_number}}
       run:
-        echo "tags=${{env.SEMVER}}-beta-${{env.BUILD_NUMBER}} latest" >> $GITHUB_OUTPUT
-
-    - name: debug
-      shell: bash
-      env:
-        dependabot_tags: ${{steps.create_image_tags_dependabot.outputs.tags }}
-      run: echo ${{env.dependabot_tags}}
+        echo "tags=${{env.SEMVER}}-beta-${{env.BUILD_NUMBER}}" >> $GITHUB_OUTPUT
 
     - name: create image tags
       id: create_image_tags
