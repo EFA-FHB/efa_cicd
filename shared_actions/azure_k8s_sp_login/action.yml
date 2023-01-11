@@ -1,5 +1,5 @@
-name: create_release
-description: "Creates a release"
+name: azure_k8s_sp_login
+description: "Performs login to Azure Kubernetes Service (AKS)"
 
 inputs:
   az_sp_credentials:

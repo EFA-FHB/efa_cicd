@@ -97,7 +97,7 @@ runs:
 
     - name: XRAY - send results to JIRA
       if: ${{ inputs.xray-send-reports-to-jira == 'true' }}
-      uses: mikepenz/xray-action@v2.3.0
+      uses: mikepenz/xray-action@v2.4.5
       continue-on-error: true
       #timeout-minutes: 5
       with:
