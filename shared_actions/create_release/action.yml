@@ -90,7 +90,7 @@ runs:
         if [[ ${new_version[0]} -ge ${curr_version[0]} ]]; then #major update
           type=major
         elif [[ ${type} == "major" && ${new_version[1]} -ge ${curr_version[1]} ]]; then #minor change
-          minor=true
+          type=minor
         elif [[ ${type} == "minor" && ${new_version[2]} -ge ${curr_version[2]} ]]; then #patch update
           type=patch
         fi
