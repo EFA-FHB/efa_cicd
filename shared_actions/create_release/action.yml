@@ -50,12 +50,12 @@ runs:
 
     - name: check workflow origin
       shell: bash
-      if: ${{input.requiredBranches != '' }}
+      if: ${{ inputs.requiredBranches != '' }}
       run: |
         branch="${{ github.ref_name }}"
 
-        if [[ "${{ input.requiredBranches }}" =~ "${branch}" ]]; then
-            echo >&2 "Workflow can only be executed from branches ${{ input.requiredBranches }}!"
+        if [[ "${{ inputs.requiredBranches }}" =~ "${branch}" ]]; then
+            echo >&2 "Workflow can only be executed from branches ${{ inputs.requiredBranches }}!"
             exit 1;
         fi
 
