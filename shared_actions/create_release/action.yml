@@ -32,6 +32,9 @@ inputs:
   ngrokDebugEnable:
     description: "Whether to launch ngrok debugging on step failures"
     required: false
+  requiredBranches:
+    description: "List of branches allowed to create a release from"
+    required: false
 runs:
   using: "composite"
 
@@ -47,11 +50,12 @@ runs:
 
     - name: check workflow origin
       shell: bash
+      if: ${{input.requiredBranches != '' }}
       run: |
         branch="${{ github.ref_name }}"
 
-        if [[ "${branch}" != "main" ]]; then
-            echo >&2 "Releases can only be triggered from the "main" branch!"
+        if [[ "${{ input.requiredBranches }}" =~ "${branch}" ]]; then
+            echo >&2 "Workflow can only be executed from branches ${{ input.requiredBranches }}!"
             exit 1;
         fi
 
