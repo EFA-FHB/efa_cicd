@@ -87,11 +87,11 @@ runs:
         IFS="." read -r -a new_version <<< "${{ steps.tag.outputs.new_version }}"
 
         type=
-        if [[ ${new_version[0]} -gte ${curr_version[0]} ]]; then #major update
+        if [[ ${new_version[0]} -ge ${curr_version[0]} ]]; then #major update
           type=major
-        elif [[ ${type} == "major" && ${new_version[1]} -gte ${curr_version[1]} ]]; then #minor change
+        elif [[ ${type} == "major" && ${new_version[1]} -ge ${curr_version[1]} ]]; then #minor change
           minor=true
-        elif [[ ${type} == "minor" && ${new_version[2]} -gte ${curr_version[2]} ]]; then #patch update
+        elif [[ ${type} == "minor" && ${new_version[2]} -ge ${curr_version[2]} ]]; then #patch update
           type=patch
         fi
 
