@@ -54,8 +54,8 @@ runs:
       run: |
         branch="${{ github.ref_name }}"
 
-        if [[ "${{ inputs.requiredBranches }}" =~ "${branch}" ]]; then
-            echo >&2 "Workflow can only be executed from branches ${{ inputs.requiredBranches }}!"
+        if [[ ! "${{ inputs.requiredBranches }}" =~ "${branch}" ]]; then
+            echo >&2 "Workflow can only be executed from branches '${{ inputs.requiredBranches }}'!"
             exit 1;
         fi
 
@@ -178,62 +178,6 @@ runs:
         token: ${{ inputs.token }}
         branch: "development"
         debug: true
-
-    - name: cherry-pick
-      shell: bash
-      env:
-        snapshotVersion: ${{steps.snapshot_version.outputs.value}}
-        GITHUB_TOKEN: ${{ inputs.token }}
-        GIT_AUTHOR_NAME: ${{ steps.import_gpg.outputs.name }}
-        GIT_AUTHOR_EMAIL: ${{ steps.import_gpg.outputs.email }}
-        GIT_COMMITTER_NAME: ${{ steps.import_gpg.outputs.name }}
-        GIT_COMMITTER_EMAIL: ${{ steps.import_gpg.outputs.email }}
-      run: |
-       echo "checkout development"
-       git checkout development
-
-       echo "get last commit"
-       commit="$(git rev-parse HEAD)"
-       echo "last commit is: $commit"
-
-       echo "checkout main"
-       git checkout main
-
-       echo "pulling main"
-       git pull || true
-
-       echo "get status"
-       status=$(git status --porcelain)
-       echo "status is: $status"
-
-       if [[ "$status" =~ gradle.properties ]]; then
-        echo "conflict after pull!"
-        sed -i '/<<</,/===/d' gradle.properties
-        sed -i '/>>>/d' gradle.properties
-        git add gradle.properties && git commit -S -m "[github] catchup"
-       fi
-
-       echo "cherry-picking $commit"
-       git cherry-pick -x "${commit}" || true
-       echo "get status"
-       status=$(git status --porcelain)
-       echo "status is: $status"
-
-       if [[ "$status" == "UU gradle.properties" ]]; then
-        echo "conflict after cherry-pick!"
-        sed -i '/<<</,/===/d' gradle.properties
-        sed -i '/>>>/d' gradle.properties
-        git add gradle.properties && git commit -S -m "[github] cherry-pick SNAPSHOT commit $commit"
-       fi
-
-    - name: git push
-      uses: CasperWA/push-protected@v2.10.0
-      with:
-        token: ${{ inputs.token }}
-        tags: true
-        branch: "main"
-        debug: true
-        force: true
 
     - name: changelog config template
       id: changelog_config_path
