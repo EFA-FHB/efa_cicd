@@ -15,8 +15,8 @@ on:
         required: true
         options:
           - esender
-          - ext-validator
-          - int-validator
+          - ext-eforms-validator
+          - int-eforms-validator
           - bkms-mediator
           - ai-adapter
 
@@ -35,13 +35,15 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        app: ["esender", "bkms-mediator", "ext-validator", "int-validator", "ai-adapter"]
-        image: [app, schema]
+        app: ["esender", "bkms-mediator", "ext-eforms-validator", "int-eforms-validator", "ai-adapter"]
+        image: [app]
         include:
-          - app: ext-validator
-            image: app
-          - app: int-validator
-            image: app
+          - app: esender
+            image: schema
+          - app: bkms-mediator
+            image: schema
+          - app: ai-adapter
+            image: schema
 
     steps:
 
