@@ -7,11 +7,11 @@ on:
     inputs:
       tag:
         type: string
-        description: 'Image tag to deploy'
+        description: 'Tag to sync back to Azure'
         required: true
       stage:
         type: choice
-        description: 'Environment to deploy to'
+        description: 'Application to sync tags for'
         required: true
         options:
           - esender
