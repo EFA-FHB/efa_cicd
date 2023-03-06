@@ -1,0 +1,73 @@
+# This workflow deletes outdated images from the Azure Container Registry (ACR)
+#
+name: "🧹 sync_tag_GISA_TO_AZURE"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: tag
+        description: 'Image tag to deploy'
+        required: true
+      stage:
+        type: app
+        description: 'Environment to deploy to'
+        required: true
+        options:
+          - esender
+          - ext-validator
+          - int-validator
+          - bkms-mediator
+          - ai-adapter
+
+concurrency:
+  group: sync_tag_GISA_TO_AZURE
+
+env:
+  AZURE_DOCKER_REGISTRY: efafhb.azurecr.io
+  GISA_DOCKER_REGISTRY: registry.hb-interim.gisa.de
+
+jobs:
+
+  sync:
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        app: ["esender", "bkms-mediator", "ext-validator", "int-validator", "ai-adapter"]
+        image: [app, schema]
+        include:
+          - app: ext-validator
+            image: app
+          - app: int-validator
+            image: app
+
+    steps:
+
+      - name: Login to Azure registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.AZURE_DOCKER_REGISTRY }}
+          username: ${{ secrets.AZURE_EFA_FHB_ACR_USERNAME }}
+          password: ${{ secrets.AZURE_EFA_FHB_ACR_PASSWORD }}
+
+      - name: Login to Gisa registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.GISA_DOCKER_REGISTRY }}
+          username: ${{ secrets.GISA_REGISTRY_USERNAME }}
+          password: ${{ secrets.GISA_REGISTRY_PASSWORD }}
+
+      - name: sync_image for ${{ matrix.app }}
+        if: ${{ inputs.app == matrix.app }}
+        shell: bash
+        env:
+          source_tag: ${{ env.GISA_DOCKER_REGISTRY }}/${{ matrix.app }}-${{ matrix.image }}:${{ inputs.tag }}
+          dest_tag: ${{ env.AZURE_DOCKER_REGISTRY }}/${{ matrix.app }}-${{ matrix.image }}:${{ inputs.tag }}
+        run: |
+          source_tag=${{ env.source_tag }}
+          dest_tag=${{ env.dest_tag }}
+          docker pull $source_tag
+          docker tag $source_tag $dest_tag
+          docker push $dest_tag
