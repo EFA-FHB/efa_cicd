@@ -1,6 +1,6 @@
 # This workflow deletes outdated images from the Azure Container Registry (ACR)
 #
-name: "🧹 sync_tag_GISA_TO_AZURE"
+name: "🔃 sync_tag_GISA_TO_AZURE"
 
 on:
   workflow_dispatch:
