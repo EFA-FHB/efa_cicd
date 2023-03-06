@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        type: tag
+        type: string
         description: 'Image tag to deploy'
         required: true
       stage:
-        type: app
+        type: choice
         description: 'Environment to deploy to'
         required: true
         options:
