@@ -9,7 +9,7 @@ on:
         type: string
         description: 'Tag to sync back to Azure'
         required: true
-      stage:
+      app:
         type: choice
         description: 'Application to sync tags for'
         required: true
