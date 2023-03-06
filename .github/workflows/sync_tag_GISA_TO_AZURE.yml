@@ -47,22 +47,24 @@ jobs:
 
     steps:
 
-      - name: Login to Azure registry
+      - if: ${{ inputs.app == matrix.app }}
+        name: Login to Azure registry
         uses: docker/login-action@v2.1.0
         with:
           registry: ${{ env.AZURE_DOCKER_REGISTRY }}
           username: ${{ secrets.AZURE_EFA_FHB_ACR_USERNAME }}
           password: ${{ secrets.AZURE_EFA_FHB_ACR_PASSWORD }}
 
-      - name: Login to Gisa registry
+      - if: ${{ inputs.app == matrix.app }}
+        name: Login to Gisa registry
         uses: docker/login-action@v2.1.0
         with:
           registry: ${{ env.GISA_DOCKER_REGISTRY }}
           username: ${{ secrets.GISA_REGISTRY_USERNAME }}
           password: ${{ secrets.GISA_REGISTRY_PASSWORD }}
 
-      - name: sync_image for ${{ matrix.app }}
-        if: ${{ inputs.app == matrix.app }}
+      - if: ${{ inputs.app == matrix.app }}
+        name: sync_image for ${{ matrix.app }}
         shell: bash
         env:
           source_tag: ${{ env.GISA_DOCKER_REGISTRY }}/${{ matrix.app }}-${{ matrix.image }}:${{ inputs.tag }}
