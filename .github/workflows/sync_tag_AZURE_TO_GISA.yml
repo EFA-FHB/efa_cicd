@@ -1,0 +1,77 @@
+# This workflow deletes outdated images from the Azure Container Registry (ACR)
+#
+name: "🔃 sync_tag_AZURE_TO_GISA"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: 'Tag to sync back to Azure'
+        required: true
+      app:
+        type: choice
+        description: 'Application to sync tags for'
+        required: true
+        options:
+          - esender
+          - ext-eforms-validator
+          - int-eforms-validator
+          - bkms-mediator
+          - ai-adapter
+
+concurrency:
+  group: sync_tag_AZURE_TO_GISA
+
+env:
+  AZURE_DOCKER_REGISTRY: efafhb.azurecr.io
+  GISA_DOCKER_REGISTRY: registry.hb-interim.gisa.de
+
+jobs:
+
+  sync:
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        app: ["esender", "bkms-mediator", "ext-eforms-validator", "int-eforms-validator", "ai-adapter"]
+        image: [app]
+        include:
+          - app: esender
+            image: schema
+          - app: bkms-mediator
+            image: schema
+          - app: ai-adapter
+            image: schema
+
+    steps:
+
+      - if: ${{ inputs.app == matrix.app }}
+        name: Login to Azure registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.AZURE_DOCKER_REGISTRY }}
+          username: ${{ secrets.AZURE_EFA_FHB_ACR_USERNAME }}
+          password: ${{ secrets.AZURE_EFA_FHB_ACR_PASSWORD }}
+
+      - if: ${{ inputs.app == matrix.app }}
+        name: Login to Gisa registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.GISA_DOCKER_REGISTRY }}
+          username: ${{ secrets.GISA_REGISTRY_USERNAME }}
+          password: ${{ secrets.GISA_REGISTRY_PASSWORD }}
+
+      - if: ${{ inputs.app == matrix.app }}
+        name: sync_image for ${{ matrix.app }}
+        shell: bash
+        env:
+          source_tag: ${{ env.AZURE_DOCKER_REGISTRY }}/${{ matrix.app }}-${{ matrix.image }}:${{ inputs.tag }}
+          dest_tag: ${{ env.GISA_DOCKER_REGISTRY }}/${{ matrix.app }}-${{ matrix.image }}:${{ inputs.tag }}
+        run: |
+          source_tag=${{ env.source_tag }}
+          dest_tag=${{ env.dest_tag }}
+          docker pull $source_tag
+          docker tag $source_tag $dest_tag
+          docker push $dest_tag
