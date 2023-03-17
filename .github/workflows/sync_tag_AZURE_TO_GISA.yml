@@ -7,7 +7,7 @@ on:
     inputs:
       tag:
         type: string
-        description: 'Tag to sync back to Azure'
+        description: 'Tag to sync to GISA'
         required: true
       app:
         type: choice
