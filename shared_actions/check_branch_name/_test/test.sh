@@ -68,6 +68,8 @@ main() {
   test "expected_exit=1" "REF_NAME=hotfix/603345-6-setup-shared-base-docker-images"
   test "expected_exit=1" "REF_NAME=hotfix/D603345-setup-shared-base-docker-images"
 
+  test "expected_exit=0" "REF_NAME=dependabot/gradle/app/development/org.projectlombok-lombok-1.18.26"
+
   test "expected_exit=0" "REF_NAME=v5.0.0"
   test "expected_exit=1" "REF_NAME=5.0.0"
   test "expected_exit=1" "REF_NAME=v5.0"

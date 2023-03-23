@@ -86,6 +86,7 @@ main() {
   test "expected_result=6.11.11-42" "REF_NAME=main;BUILD_NUMBER=42;SEMVER=6.11.11"
   test "expected_result=6.11.11-rc-42%%6.11.11-rc-latest" "REF_NAME=release/milestone-4;BUILD_NUMBER=42;SEMVER=6.11.11"
 
+  test "expected_result=6.11.11-dependabot-42%%6.11.11-dependabot-latest" "REF_NAME=dependabot/gradle/app/development/org.projectlombok-lombok-1.18.26;BUILD_NUMBER=42;SEMVER=6.11.11"
 
   echo "passed=${passed};failed=${failed}"
 

@@ -32,6 +32,12 @@ _create_tags() {
     } done
   fi
 
+  if [[ ${REF_NAME} =~ ^dependabot/.+ ]]; then
+    for suffix in ${BUILD_NUMBER} latest; do {
+      tags+=("${version_core}-dependabot-${suffix}")
+    } done
+  fi
+
   if [[ ${REF_NAME} =~ ^(feature|hotfix|bugfix)/.+ ]]; then
     local issue_number=$(_extract_issue_number)
     local branch_prefix=$(_extract_branch_prefix)
