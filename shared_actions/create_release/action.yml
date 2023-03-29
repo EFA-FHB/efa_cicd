@@ -146,7 +146,7 @@ runs:
       run: |
         IFS="." read -r -a parts <<< "${{env.version}}"
         parts[2]=$((parts[2]+1)) #increment patch version
-        version="$(echo ${parts[*]} | tr ' ' '.')"
+        version="$(echo ${parts[*]} | tr ' ' '.')-SNAPSHOT"
         echo "value=${version}" >> $GITHUB_OUTPUT
 
     - name: update gradle.properties
