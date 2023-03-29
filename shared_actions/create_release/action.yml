@@ -60,8 +60,8 @@ runs:
         reqBranches="${{ inputs.requiredBranches }}"
         reqBranchPattern="${{ inputs.requiredBranchPattern }}"
 
-        if [[ ${#regBranches} -gt 0 && ! "${regBranches}" =~ "${branch}" ]]; then
-            echo >&2 "Workflow can only be executed on branches '${regBranches}'!"
+        if [[ ${#reqBranches} -gt 0 && ! "${reqBranches}" =~ "${branch}" ]]; then
+            echo >&2 "Workflow can only be executed on branches '${reqBranches}'!"
             exit 1;
         fi
 
