@@ -65,7 +65,7 @@ runs:
             exit 1;
         fi
 
-        if [[ ! "${ branch }" =~ "${reqBranchPattern}" ]]; then
+        if [[ ! "${branch}" =~ ${reqBranchPattern} ]]; then
             echo >&2 "Workflow can only be executed on branches matching pattern '${reqBranchPattern}'!"
             exit 1;
         fi
