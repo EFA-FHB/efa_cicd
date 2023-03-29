@@ -35,6 +35,10 @@ inputs:
   requiredBranches:
     description: "List of branches allowed to create a release from"
     required: false
+  requiredBranchPattern:
+    description: "Regex pattern to identify allowed branches to create a release from"
+    default: "^release/.+|main$"
+    required: false
 runs:
   using: "composite"
 
@@ -50,14 +54,20 @@ runs:
 
     - name: check workflow origin
       shell: bash
-      if: ${{ inputs.requiredBranches != '' }}
+      if: ${{ inputs.requiredBranches != '' ||  inputs.requiredBranchPattern != '' }}
       run: |
         branch="${{ github.ref_name }}"
 
         if [[ ! "${{ inputs.requiredBranches }}" =~ "${branch}" ]]; then
-            echo >&2 "Workflow can only be executed from branches '${{ inputs.requiredBranches }}'!"
+            echo >&2 "Workflow can only be executed on branches '${{ inputs.requiredBranches }}'!"
             exit 1;
         fi
+
+        if [[ ! "${ branch }" =~ "${{ inputs.requiredBranchPattern }}" ]]; then
+            echo >&2 "Workflow can only be executed on branches matching pattern '${{ inputs.requiredBranchPattern }}'!"
+            exit 1;
+        fi
+
 
     - name: import gpg
       id: import_gpg
