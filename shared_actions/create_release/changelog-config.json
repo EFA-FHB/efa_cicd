@@ -13,6 +13,10 @@
       "labels": ["test"]
     },
     {
+      "title": "## \uD83E\uDDF0 Dependencies",
+      "labels": ["dependencies"]
+    },
+    {
       "title": "## 🧪 Tests and some 🪄 Magic",
       "labels": ["test", "magic"],
       "exclude_labels": ["no-magic"],
