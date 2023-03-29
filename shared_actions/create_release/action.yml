@@ -57,14 +57,16 @@ runs:
       if: ${{ inputs.requiredBranches != '' ||  inputs.requiredBranchPattern != '' }}
       run: |
         branch="${{ github.ref_name }}"
+        reqBranches="${{ inputs.requiredBranches }}"
+        reqBranchPattern="${{ inputs.requiredBranchPattern }}"
 
-        if [[ ! "${{ inputs.requiredBranches }}" =~ "${branch}" ]]; then
-            echo >&2 "Workflow can only be executed on branches '${{ inputs.requiredBranches }}'!"
+        if [[ ${#regBranches} -gt 0 && ! "${regBranches}" =~ "${branch}" ]]; then
+            echo >&2 "Workflow can only be executed on branches '${regBranches}'!"
             exit 1;
         fi
 
-        if [[ ! "${ branch }" =~ "${{ inputs.requiredBranchPattern }}" ]]; then
-            echo >&2 "Workflow can only be executed on branches matching pattern '${{ inputs.requiredBranchPattern }}'!"
+        if [[ ! "${ branch }" =~ "${reqBranchPattern}" ]]; then
+            echo >&2 "Workflow can only be executed on branches matching pattern '${reqBranchPattern}'!"
             exit 1;
         fi
 
