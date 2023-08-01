@@ -28,7 +28,7 @@ outputs:
     description: "SHA-Digest of created image"
     value: "${{ steps.build_image.outputs.digest }}"
   tags:
-    description: "Space separated list of tags associated with SHA-Digest of creaed images"
+    description: "Space separated list of tags associated with SHA-Digest of created images"
     value: "${{ steps.prepare_push.outputs.tags }}"
 runs:
   using: "composite"
