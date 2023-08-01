@@ -39,6 +39,8 @@ jobs:
         app: ["ssp-service","esender", "bkms-mediator", "ext-eforms-validator", "int-eforms-validator", "ai-adapter"]
         image: [app]
         include:
+          - app: ssp-service
+            image: schema
           - app: esender
             image: schema
           - app: bkms-mediator
