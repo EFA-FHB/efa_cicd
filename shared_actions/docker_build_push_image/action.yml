@@ -22,6 +22,9 @@ inputs:
     description: "Whether to push docker images"
     required: false
     default: "true"
+  buildArgs:
+    description: "List of build-args to pass to docker build"
+    required: false
 
 outputs:
   digest:
@@ -58,6 +61,7 @@ runs:
         push: false #do not push here
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        build-args: ${{ inputs.buildArgs }}
 
     - name: Apply additional tags
       id: prepare_push
