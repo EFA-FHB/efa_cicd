@@ -14,7 +14,8 @@ Name | Mandatory | Description | Default | Example
 `dockerfilePath` | `yes` | Path to Dockerfile  | | `schema/src/main/docker/Dockerfile.jvm`
 `scanImage` | `no` | Whether to scan the created docker image with [Trivy](https://aquasecurity.github.io/trivy). | `true` | 
 `pushImage` | `no` | Whether to push the created docker manifest and its associated tags | `true` | 
- 
+`buildArgs` | `no` | List of key/values pairs which will be supplied as build-args to `docker build` | `true` | 
+
 ## Outputs
 
 Name | Description | Example
