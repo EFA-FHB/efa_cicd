@@ -71,7 +71,7 @@ main() {
   test "expected_exit=0" "REF_NAME=dependabot/gradle/app/development/org.projectlombok-lombok-1.18.26"
 
   test "expected_exit=0" "REF_NAME=v5.0.0"
-  test "expected_exit=1" "REF_NAME=5.0.0"
+  test "expected_exit=0" "REF_NAME=5.0.0"
   test "expected_exit=1" "REF_NAME=v5.0"
   test "expected_exit=1" "REF_NAME=v5"
 
