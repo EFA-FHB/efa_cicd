@@ -7,7 +7,7 @@ DEBUG=${DEBUG:-false}
 
 main() {
 
-  if [[ "${REF_NAME}" =~ ^v([0-9]+\.){2}[0-9]+ ]]; then
+  if [[ "${REF_NAME}" =~ ^v?([0-9]+\.){2}[0-9]+ ]]; then
     exit 0
   elif [[ "${REF_NAME}" =~ ^(main|development)$ ]]; then
     exit 0
