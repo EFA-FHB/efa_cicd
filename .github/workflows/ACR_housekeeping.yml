@@ -94,7 +94,6 @@ jobs:
 
               while read tag; do {
                   echo "Deleting tag ${tag}"
-                  continue
                   az acr repository delete --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
                     --image ${{matrix.repo}}:$tag \
                     --yes || true
