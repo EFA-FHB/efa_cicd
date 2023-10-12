@@ -14,7 +14,8 @@ concurrency:
 env:
   AZURE_SUBSCRIPTION_NAME: Pay-As-You-Go-eVergabe-EFA-FHB
   AZURE_ACR_RESOURCE_NAME: efafhb
-  KEEP_TAGS: ("feature:50" "bugfix:50" "dev:50" ":99999")
+  # space separated list of parts of branch name and number of tags to keep
+  KEEP_TAGS: "feature:50 bugfix:50 dev:50 :99999"
 
 
 jobs:
@@ -78,7 +79,7 @@ jobs:
       - name: delete tags
         shell: bash
         run: |
-          for KEEP_TAG in ${${{env.KEEP_TAGS}}[@]}; do
+          for KEEP_TAG in `echo ${{env.KEEP_TAGS}}`; do
               FILTER=`echo $KEEP_TAG | cut -d":" -f1`
               KEEP_NUM=`echo $KEEP_TAG | cut -d":" -f2`
 
