@@ -83,7 +83,7 @@ jobs:
               FILTER=`echo $KEEP_TAG | cut -d":" -f1`
               KEEP_NUM=`echo $KEEP_TAG | cut -d":" -f2`
 
-              cat repo.tags | grep "$FILTER" | awk "NR > $KEEP_NUM {print}" > to_delete.tags
+              cat repo.tags | grep "$FILTER" | awk "NR > $KEEP_NUM {print}" > to_delete.tags || true
 
               if [[ $(cat to_delete.tags | wc -l) -eq 0 ]]; then
                   echo "No tags to delete for repo \"${{matrix.repo}}\" and branches matching \"$FILTER\""
