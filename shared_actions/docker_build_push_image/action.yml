@@ -97,6 +97,7 @@ runs:
           --ignore-unfixed \
           --exit-code 1 \
           --severity HIGH,CRITICAL \
+          --reset \
           --scanners vuln ${{steps.prepare_push.outputs.image}}
 
     - name: Push images
