@@ -91,9 +91,13 @@ runs:
 
     - name: Scan image for vulnerabilities
       if: ${{inputs.scanImage != 'false' }}
-      uses: docker://docker.io/aquasec/trivy
-      with:
-        args: image --ignore-unfixed --exit-code 1 --scanners vuln --severity "HIGH,CRITICAL" ${{steps.prepare_push.outputs.image}}
+      shell: bash
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
+          --ignore-unfixed \
+          --exit-code 1 \
+          --severity HIGH,CRITICAL \
+          --scanners vuln ${{steps.prepare_push.outputs.image}}
 
     - name: Push images
       if: ${{inputs.pushImage != 'false' }}
