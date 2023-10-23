@@ -93,7 +93,7 @@ runs:
       if: ${{inputs.scanImage != 'false' }}
       uses: docker://docker.io/aquasec/trivy
       with:
-        args: image --ignore-unfixed --exit-code 1 --security-checks vuln --severity "HIGH,CRITICAL" ${{steps.prepare_push.outputs.image}}
+        args: image --ignore-unfixed --exit-code 1 --scanners vuln --severity "HIGH,CRITICAL" ${{steps.prepare_push.outputs.image}}
 
     - name: Push images
       if: ${{inputs.pushImage != 'false' }}
