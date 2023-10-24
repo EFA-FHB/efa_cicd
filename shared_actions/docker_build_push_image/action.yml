@@ -94,7 +94,7 @@ runs:
       shell: bash
 
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:v0.42.0 image \
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.42.0 image \
           --ignore-unfixed \
           --exit-code 1 \
           --severity HIGH,CRITICAL \
