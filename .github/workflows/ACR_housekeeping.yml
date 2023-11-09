@@ -15,7 +15,7 @@ env:
   AZURE_SUBSCRIPTION_NAME: Pay-As-You-Go-eVergabe-EFA-FHB
   AZURE_ACR_RESOURCE_NAME: efafhb
   # space separated list of parts of branch name and number of tags to keep
-  KEEP_TAGS: "feature:50 bugfix:50 dev:50 :99999"
+  KEEP_TAGS: "feature:30 bugfix:30 beta:30 :99999"
 
 
 jobs:
