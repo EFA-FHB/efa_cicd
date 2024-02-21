@@ -32,6 +32,7 @@ jobs:
           echo "repos=$(gh repo list EFA-FHB --private | awk '{print$1}' | jq -cnR '[inputs]')" >> $GITHUB_OUTPUT
 
   cleanup:
+    needs: [get_repos]
     runs-on: ubuntu-latest
     continue-on-error: true
 
