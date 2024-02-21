@@ -11,20 +11,33 @@ on:
 concurrency:
   group: cleanup_repository_workflow_runs
 
+permissions:
+  actions: write
+
 jobs:
+
+  get_repos:
+    runs-on: ubuntu-latest
+
+    outputs:
+      repos: ${{ steps.get_repos.outputs.repos }}
+
+    steps:
+      - name: get repos
+        id: get_repos
+        shell: bash
+        env:
+          GITHUB_TOKEN: {{secrets.REPO_WORKFLOWS_CLEANUP_TOKEN}}
+        run: |
+          echo "repos=$(gh repo list EFA-FHB --private | awk '{print$1}' | jq -cnR '[inputs]')" >> $GITHUB_OUTPUT
 
   cleanup:
     runs-on: ubuntu-latest
     continue-on-error: true
+
     strategy:
       matrix:
-        repo:
-          - bkms-mediator
-          - vergabesystem-adapter
-          - k8s_workflows
-          - bkms-mock-server
-          - ai-vergabeplattform-mock
-          - efa_cicd
+        repo: ${{ fromJson(needs.get_repos.outputs.repos) }}
 
     name: "clean ${{matrix.repo}}"
     steps:
@@ -34,5 +47,6 @@ jobs:
       - name: cleanup_workflow_runs
         uses: ./.github/actions/cleanup_workflow_runs
         with:
-          token: ${{secrets.REPO_ACCESS_TOKEN}}
-          repo: "EFA-FHB/${{matrix.repo}}"
+          retain-max-run-count: 200
+          token: ${{secrets.REPO_WORKFLOWS_CLEANUP_TOKEN}}
+          repo: "${{matrix.repo}}"
