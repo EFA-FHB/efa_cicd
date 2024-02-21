@@ -27,7 +27,7 @@ jobs:
         id: get_repos
         shell: bash
         env:
-          GITHUB_TOKEN: {{secrets.REPO_WORKFLOWS_CLEANUP_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.REPO_WORKFLOWS_CLEANUP_TOKEN}}
         run: |
           echo "repos=$(gh repo list EFA-FHB --private | awk '{print$1}' | jq -cnR '[inputs]')" >> $GITHUB_OUTPUT
 
