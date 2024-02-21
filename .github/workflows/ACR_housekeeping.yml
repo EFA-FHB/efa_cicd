@@ -56,8 +56,9 @@ jobs:
     steps:
 
       - uses: azure/login@v1
+        name: Azure login
         with:
-          creds: ${{ secrets.AZURE_EFA_FHB_SP_AAD_CREDENTIALS  }}
+          creds: '{"clientId":"${{ secrets.AZURE_EFA_FHB_SP_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_EFA_FHB_SP_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_EFA_FHB_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_EFA_FHB_TENANT_ID }}"}'
 
       - name: set subscription
         shell: bash
