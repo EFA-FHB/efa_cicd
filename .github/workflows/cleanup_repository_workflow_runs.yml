@@ -43,7 +43,7 @@ jobs:
     name: "clean ${{matrix.repo}}"
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: cleanup_workflow_runs
         uses: ./.github/actions/cleanup_workflow_runs

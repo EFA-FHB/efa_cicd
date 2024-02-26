@@ -52,7 +52,7 @@ jobs:
 
       - if: ${{ inputs.app == matrix.app }}
         name: Login to Azure registry
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.AZURE_DOCKER_REGISTRY }}
           username: ${{ secrets.AZURE_EFA_FHB_ACR_USERNAME }}
@@ -60,7 +60,7 @@ jobs:
 
       - if: ${{ inputs.app == matrix.app }}
         name: Login to Gisa registry
-        uses: docker/login-action@v2.1.0
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.GISA_DOCKER_REGISTRY }}
           username: ${{ secrets.GISA_REGISTRY_USERNAME }}
