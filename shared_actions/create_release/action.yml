@@ -47,10 +47,10 @@ inputs:
 outputs:
   upload_url:
     description: "Upload URL for release assets"
-    value: ${{ steps.create_release.outputs.urload_url }}
-  version:
+    value: ${{ steps.create_release.outputs.upload_url }}
+  new_tag:
     description: "Upload URL for release assets"
-    value: ${{ steps.tag.outputs.new_version }}
+    value: ${{ steps.tag.outputs.new_tag }}
 
 runs:
 
@@ -107,6 +107,7 @@ runs:
     - name: compare current and new version
       shell: bash
       run: |
+        set +x
         orig_version=$(grep -E "version=" gradle.properties | cut -d "=" -f2)
 
         IFS="." read -r -a curr_version <<<"$(tr -cd '[0-9.]' <<< $orig_version)"
