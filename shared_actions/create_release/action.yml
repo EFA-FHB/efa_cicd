@@ -42,6 +42,9 @@ inputs:
 runs:
   using: "composite"
 
+  outputs:
+    upload_url: ${{ steps.create_release.outputs.urload_url }}
+
   steps:
 
     - name: check version file
@@ -205,38 +208,11 @@ runs:
         configuration: ${{steps.changelog_config_path.outputs.value}}
 
     - name: Create Release
-      uses: softprops/action-gh-release@v0.1.14
+      id: create_release
+      uses: softprops/action-gh-release@v1
       with:
         draft: ${{inputs.draft}}
         prerelease: ${{inputs.draft}}
         name: ${{inputs.name}}
         body: ${{steps.github_release.outputs.changelog}}
         tag_name: ${{steps.tag.outputs.new_tag}}
-
-    - name: hotfix - remove branch
-      if: startsWith(github.ref_name, 'hotfix/')
-      shell: bash
-      run: |
-        echo "Deleting hotfix branch ${{ github.ref_name }}"
-        git push -d origin ${{ github.ref_name }} &> /dev/null
-
-    - name: Start SSH via Ngrok
-      id: start_ngrok
-      if: ${{ failure() && inputs.ngrokDebugEnable == 'true' }}
-      shell: bash
-      run: |
-        curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
-        echo "state=${true}" >> $GITHUB_OUTPUT
-      env:
-        # After sign up on the https://ngrok.com/
-        # You can find this token here: https://dashboard.ngrok.com/get-started/setup
-        NGROK_TOKEN: ${{ inputs.ngrokToken }}
-
-        # This password you will use when authorizing via SSH
-        # USER_PASS: ${{ secrets.USER_PASS }}
-        USER_PASS: debug
-
-    - name: Don't kill instace
-      if: ${{ failure() && inputs.ngrokDebugEnable == 'true' }}
-      shell: bash
-      run: sleep 1h # Prevent to killing instance after failure
