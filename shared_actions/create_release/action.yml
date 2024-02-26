@@ -39,11 +39,15 @@ inputs:
     description: "Regex pattern to identify allowed branches to create a release from"
     default: "^release/.+|main$"
     required: false
-runs:
-  using: "composite"
 
-  outputs:
-    upload_url: ${{ steps.create_release.outputs.urload_url }}
+outputs:
+  upload_url:
+    description: "Upload URL for release assets"
+    value: ${{ steps.create_release.outputs.urload_url }}
+
+runs:
+
+  using: "composite"
 
   steps:
 
