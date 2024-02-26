@@ -14,6 +14,9 @@ concurrency:
 env:
   AZURE_SUBSCRIPTION_NAME: Pay-As-You-Go-eVergabe-EFA-FHB
   AZURE_ACR_RESOURCE_NAME: efafhb
+  # space separated list of parts of branch name and number of tags to keep
+  KEEP_TAGS: "feature:30 bugfix:30 beta:30 :99999"
+
 
 jobs:
 
@@ -78,18 +81,23 @@ jobs:
       - name: delete tags
         shell: bash
         run: |
-          awk 'NR > 100 {print}' < repo.tags > to_delete.tags
+          for KEEP_TAG in `echo ${{env.KEEP_TAGS}}`; do
+              FILTER=`echo $KEEP_TAG | cut -d":" -f1`
+              KEEP_NUM=`echo $KEEP_TAG | cut -d":" -f2`
 
-          if [[ $(cat to_delete.tags | wc -l) -eq 0 ]]; then
-            echo "No tags to delete"
-            exit 0
-          fi
+              cat repo.tags | grep "$FILTER" | awk "NR > $KEEP_NUM {print}" > to_delete.tags || true
 
-          echo "Will start deleting $(cat to_delete.tags | wc -l) tags for repo ${{matrix.repo}}"
+              if [[ $(cat to_delete.tags | wc -l) -eq 0 ]]; then
+                  echo "No tags to delete for repo \"${{matrix.repo}}\" and branches matching \"$FILTER\""
+                  continue
+              fi
 
-          while read tag; do {
-            echo "Deleting tag ${tag}"
-            az acr repository delete --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
-              --image ${{matrix.repo}}:$tag \
-              --yes || true
-          } done < to_delete.tags
+              echo "Will start deleting $(cat to_delete.tags | wc -l) tags for repo \"${{matrix.repo}}\" and branches matching \"$FILTER\""
+
+              while read tag; do {
+                  echo "Deleting tag ${tag}"
+                  az acr repository delete --name ${{env.AZURE_ACR_RESOURCE_NAME}} \
+                    --image ${{matrix.repo}}:$tag \
+                    --yes || true
+              } done < to_delete.tags
+          done
