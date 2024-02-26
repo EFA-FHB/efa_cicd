@@ -44,6 +44,9 @@ outputs:
   upload_url:
     description: "Upload URL for release assets"
     value: ${{ steps.create_release.outputs.urload_url }}
+  version:
+    description: "Upload URL for release assets"
+    value: ${{ steps.tag.outputs.new_version }}
 
 runs:
 
