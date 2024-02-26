@@ -39,6 +39,10 @@ inputs:
     description: "Regex pattern to identify allowed branches to create a release from"
     default: "^release/.+|main$"
     required: false
+  files:
+    description: "Newline-delimited globs of paths to assets to upload for release"
+    required: false
+
 
 outputs:
   upload_url:
@@ -223,3 +227,4 @@ runs:
         name: ${{inputs.name}}
         body: ${{steps.github_release.outputs.changelog}}
         tag_name: ${{steps.tag.outputs.new_tag}}
+        files: ${{ inputs.files }}
