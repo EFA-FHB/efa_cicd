@@ -36,7 +36,7 @@ function main() {
   mkdir -p "${ACTIONS_TARGET_DIR}"
 
   cd $(dirname "$0")
-  for action in $(find "${SHARED_ACTIONS_DIR}" -type d | awk 'NR > 1'); do {
+  for action in $(find "${SHARED_ACTIONS_DIR}" -type d | grep -v "_test" | awk 'NR > 1'); do {
     action_name=$(echo "${action}" | cut -d "/" -f2)
     echo "copying action \"${action_name}\" to ${ACTIONS_TARGET_DIR}"
     cp -r "${action}" "${ACTIONS_TARGET_DIR}";
